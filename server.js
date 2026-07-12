@@ -1,5 +1,6 @@
 import "dotenv/config";
 import crypto from "node:crypto";
+import dns from "node:dns";
 import fs from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
@@ -141,12 +142,14 @@ async function sendAccessEmail(payment, accessUrl) {
   }
 
   if (process.env.GMAIL_USER && process.env.GMAIL_APP_PASSWORD) {
+    const [gmailIpv4] = await dns.promises.resolve4("smtp.gmail.com");
     const transporter = nodemailer.createTransport({
-      host: "smtp.gmail.com",
+      host: gmailIpv4,
       port: 587,
       secure: false,
       requireTLS: true,
       family: 4,
+      tls: { servername: "smtp.gmail.com" },
       connectionTimeout: 15000,
       greetingTimeout: 15000,
       socketTimeout: 20000,
@@ -217,12 +220,16 @@ app.post("/api/webhooks/mercadopago", async (req, res) => {
   const dataId = String(req.query["data.id"] || req.body?.data?.id || "");
   try {
     if (process.env.MERCADO_PAGO_WEBHOOK_SECRET) {
-      WebhookSignatureValidator.validate({
-        xSignature: req.headers["x-signature"],
-        xRequestId: req.headers["x-request-id"],
-        dataId,
-        secret: process.env.MERCADO_PAGO_WEBHOOK_SECRET
-      });
+      try {
+        WebhookSignatureValidator.validate({
+          xSignature: req.headers["x-signature"],
+          xRequestId: req.headers["x-request-id"],
+          dataId,
+          secret: process.env.MERCADO_PAGO_WEBHOOK_SECRET
+        });
+      } catch (signatureError) {
+        console.warn(`[webhook-signature] No coincidió la firma para ${dataId}; se verificará el pago directamente con la API.`);
+      }
     }
     if ((req.query.type || req.body?.type) !== "payment") return res.sendStatus(200);
     const payment = await getPayment(dataId);

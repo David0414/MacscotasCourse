@@ -142,7 +142,14 @@ async function sendAccessEmail(payment, accessUrl) {
 
   if (process.env.GMAIL_USER && process.env.GMAIL_APP_PASSWORD) {
     const transporter = nodemailer.createTransport({
-      service: "gmail",
+      host: "smtp.gmail.com",
+      port: 587,
+      secure: false,
+      requireTLS: true,
+      family: 4,
+      connectionTimeout: 15000,
+      greetingTimeout: 15000,
+      socketTimeout: 20000,
       auth: { user: process.env.GMAIL_USER, pass: process.env.GMAIL_APP_PASSWORD.replace(/\s/g, "") }
     });
     await transporter.sendMail({ from, to: email, subject: "Tu acceso a Repostería Canina 🐾", html });

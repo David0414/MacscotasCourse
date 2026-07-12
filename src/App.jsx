@@ -258,11 +258,25 @@ function CoursePage() {
   const token = new URLSearchParams(window.location.search).get("token") || "";
   const [course, setCourse] = useState({loading:true});
   const [active, setActive] = useState(null);
+  const [menuOpen, setMenuOpen] = useState(false);
   useEffect(()=>{fetch(`/api/course?token=${encodeURIComponent(token)}`).then(async r=>{const data=await r.json();if(!r.ok)throw new Error(data.error);return data}).then(data=>{setCourse(data);setActive(data.files[0]||null)}).catch(error=>setCourse({error:error.message}))},[token]);
   if(course.loading) return <StatusLayout><span className="status-loader"/><h1>Abriendo tu curso…</h1></StatusLayout>;
   if(course.error) return <StatusLayout><span className="text-5xl">🔒</span><h1>Acceso no disponible</h1><p>{course.error}</p><a href="/" className="btn btn-primary mt-7 px-7 py-4">Volver al inicio</a></StatusLayout>;
   const fileUrl=active?.url||"";
-  return <div className="course-shell"><aside><a href="/" className="brand"><span>🐾</span><div><strong>Patitas & Horno</strong><small>Mi curso</small></div></a><div className="course-welcome"><small>BIENVENIDA</small><strong>{course.email}</strong></div><nav>{course.files.map((file,i)=><button className={active?.name===file.name?"active":""} onClick={()=>setActive(file)} key={file.name}><span>{file.type==="pdf"?"PDF":"▶"}</span><div><small>{file.type==="pdf"?"MATERIAL":"CLASE"} {String(i+1).padStart(2,"0")}</small><strong>{file.title}</strong></div></button>)}</nav><p>Tu enlace es personal. Guárdalo para volver cuando quieras.</p></aside><main><div className="course-top"><div><span className="kicker">TU CONTENIDO</span><h1>{active?.title||"Curso de Repostería Canina"}</h1></div>{active&&<div className="course-actions"><a href={active.downloadUrl} download className="btn btn-accent px-5 py-3">↓ Descargar</a><a href={fileUrl} target="_blank" rel="noreferrer" className="btn border-2 border-teal px-5 py-3 text-teal">Abrir ↗</a></div>}</div>{!active?<div className="course-empty">Aún no hay archivos. Agrega el contenido en Cloudflare R2 o en <code>private/course</code>.</div>:active.type==="pdf"?<iframe className="course-viewer" src={`${fileUrl}#toolbar=1`} title={active.title}/>:<video className="course-video" src={fileUrl} controls playsInline preload="metadata"/>}</main></div>;
+  return <div className={`course-shell ${menuOpen?"menu-open":""}`}>
+    <button className="course-backdrop" onClick={()=>setMenuOpen(false)} aria-label="Cerrar menú"/>
+    <aside>
+      <div className="course-menu-head"><a href="/" className="brand"><span>🐾</span><div><strong>Patitas & Horno</strong><small>Mi curso</small></div></a><button onClick={()=>setMenuOpen(false)} aria-label="Cerrar menú">×</button></div>
+      <div className="course-welcome"><small>BIENVENIDA</small><strong>{course.email}</strong></div>
+      <nav>{course.files.map((file,i)=><button className={active?.name===file.name?"active":""} onClick={()=>{setActive(file);setMenuOpen(false)}} key={file.name}><span>{file.type==="pdf"?"PDF":"▶"}</span><div><small>{file.type==="pdf"?"MATERIAL":"CLASE"} {String(i+1).padStart(2,"0")}</small><strong>{file.title}</strong></div></button>)}</nav>
+      <p>Tu enlace es personal. Guárdalo para volver cuando quieras.</p>
+    </aside>
+    <main>
+      <div className="course-mobile-bar"><button onClick={()=>setMenuOpen(true)} aria-label="Abrir clases"><span>☰</span> Clases y materiales</button><strong>Patitas & Horno</strong></div>
+      <div className="course-top"><div><span className="kicker">TU CONTENIDO</span><h1>{active?.title||"Curso de Repostería Canina"}</h1></div>{active&&<div className="course-actions"><a href={active.downloadUrl} download className="btn btn-accent px-5 py-3">↓ Descargar</a><a href={fileUrl} target="_blank" rel="noreferrer" className="btn border-2 border-teal px-5 py-3 text-teal">Abrir ↗</a></div>}</div>
+      {!active?<div className="course-empty">Aún no hay archivos. Agrega el contenido en Cloudflare R2 o en <code>private/course</code>.</div>:active.type==="pdf"?<iframe className="course-viewer" src={`${fileUrl}#toolbar=1`} title={active.title}/>:<video className="course-video" src={fileUrl} controls playsInline preload="metadata"/>}
+    </main>
+  </div>;
 }
 
 export default App;

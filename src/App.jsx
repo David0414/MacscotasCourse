@@ -251,7 +251,16 @@ function ThankYouPage() {
   useEffect(() => {
     const paymentId = new URLSearchParams(window.location.search).get("payment_id") || new URLSearchParams(window.location.search).get("collection_id");
     if (!paymentId) return setResult({status:"invalid"});
-    fetch(`/api/payment/status?payment_id=${encodeURIComponent(paymentId)}`).then(r=>r.json()).then(setResult).catch(()=>setResult({status:"error"}));
+    fetch(`/api/payment/status?payment_id=${encodeURIComponent(paymentId)}`).then(r=>r.json()).then((data)=>{
+      setResult(data);
+      if(data.status==="approved"){
+        const purchaseKey=`meta-purchase-${paymentId}`;
+        if(!sessionStorage.getItem(purchaseKey)){
+          trackMeta("Purchase",{value:SITE_CONFIG.price,currency:SITE_CONFIG.currency,content_name:SITE_CONFIG.productName});
+          sessionStorage.setItem(purchaseKey,"1");
+        }
+      }
+    }).catch(()=>setResult({status:"error"}));
   }, []);
   return <StatusLayout>{result.status==="loading"&&<><span className="status-loader"/><h1>Confirmando tu pago…</h1><p>Estamos consultando directamente con Mercado Pago.</p></>}{result.status==="approved"&&<><span className="status-success">✓</span><h1>¡Tu curso está listo!</h1><p>Enviamos el acceso a <strong>{result.email}</strong>. También puedes guardarlo ahora.</p><div className="status-actions"><a href={result.accessUrl} className="btn btn-accent px-8 py-4">Entrar a mi curso →</a>{result.whatsappUrl&&<a href={result.whatsappUrl} target="_blank" rel="noreferrer" className="btn whatsapp-save px-8 py-4">Guardar en WhatsApp</a>}</div><small>El acceso se envía al correo escrito antes de pagar.</small></>}{result.status==="pending"&&<><span className="text-5xl">⌛</span><h1>Tu pago está pendiente</h1><p>Te enviaremos el acceso automáticamente cuando Mercado Pago lo apruebe.</p><a href="/" className="btn btn-primary mt-7 px-7 py-4">Volver al inicio</a></>}{["invalid","error","rejected","cancelled"].includes(result.status)&&<><span className="text-5xl">⚠️</span><h1>No pudimos validar el pago</h1><p>No se entregó ningún acceso. Vuelve a intentarlo o contáctanos si ya ves el cargo.</p><a href="/" className="btn btn-primary mt-7 px-7 py-4">Volver al inicio</a></>}</StatusLayout>;
 }

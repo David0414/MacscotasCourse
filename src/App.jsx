@@ -177,7 +177,7 @@ function PdfPreview({ onBuy }) {
   return <section id="muestra" className="pdf-preview-section py-20 lg:py-28"><div className="container-page grid items-center gap-12 lg:grid-cols-[.8fr_1.2fr] lg:gap-20"><div><span className="kicker">HOJEA ANTES DE COMPRAR</span><h2 className="editorial-title mt-4">Una probadita<br/><em>del recetario.</em></h2><p className="mt-6 text-lg text-[#617876]">Lee aquí mismo algunas páginas del material. La versión completa y las clases en video se entregan automáticamente después de aprobarse tu pago.</p><button onClick={onBuy} className="btn btn-accent mt-8 px-7 py-4">Obtener recetario + curso →</button></div><div className="pdf-browser"><div className="pdf-browser-bar"><span/><span/><span/><strong>Vista previa · Repostería Canina</strong></div>{available ? <PdfReader url="/vista-previa-ebook.pdf" /> : <div className="pdf-empty"><span>📖</span><strong>La vista previa está preparada</strong><p>Coloca el archivo <code>vista-previa-ebook.pdf</code> dentro de la carpeta <code>public</code>.</p></div>}<div className="pdf-lock"><span>🔒</span><div><strong>Vista previa gratuita</strong><small>El recetario completo se entrega después del pago</small></div></div></div></div></section>;
 }
 
-function PdfReader({ url }) {
+function PdfReader({ url, courseMode = false }) {
   const canvasRef = useRef(null);
   const wrapRef = useRef(null);
   const [document, setDocument] = useState(null);
@@ -219,7 +219,7 @@ function PdfReader({ url }) {
 
   if (error) return <div className="pdf-reader-message">{error}</div>;
   if (!document) return <div className="pdf-reader-message"><span className="status-loader"/>Cargando recetario…</div>;
-  return <div className="pdf-reader" ref={wrapRef}><div className="pdf-canvas-wrap"><canvas ref={canvasRef}/></div><div className="pdf-controls"><button disabled={page===1} onClick={()=>setPage(p=>p-1)}>← Anterior</button><strong>Página {page} de {document.numPages}</strong><button disabled={page===document.numPages} onClick={()=>setPage(p=>p+1)}>Siguiente →</button></div></div>;
+  return <div className={`pdf-reader ${courseMode?"course-pdf-reader":""}`} ref={wrapRef}><div className="pdf-canvas-wrap"><canvas ref={canvasRef}/></div><div className="pdf-controls"><button disabled={page===1} onClick={()=>setPage(p=>p-1)}>← Anterior</button><strong>Página {page} de {document.numPages}</strong><button disabled={page===document.numPages} onClick={()=>setPage(p=>p+1)}>Siguiente →</button></div></div>;
 }
 
 function CheckoutModal({ onClose, onError }) {
@@ -268,13 +268,13 @@ function CoursePage() {
     <aside>
       <div className="course-menu-head"><a href="/" className="brand"><span>🐾</span><div><strong>Patitas & Horno</strong><small>Mi curso</small></div></a><button onClick={()=>setMenuOpen(false)} aria-label="Cerrar menú">×</button></div>
       <div className="course-welcome"><small>BIENVENIDA</small><strong>{course.email}</strong></div>
-      <nav>{course.files.map((file,i)=><button className={active?.name===file.name?"active":""} onClick={()=>{setActive(file);setMenuOpen(false)}} key={file.name}><span>{file.type==="pdf"?"PDF":"▶"}</span><div><small>{file.type==="pdf"?"MATERIAL":"CLASE"} {String(i+1).padStart(2,"0")}</small><strong>{file.title}</strong></div></button>)}</nav>
+      <nav>{course.files.map((file,i)=><button className={active?.name===file.name?"active":""} onClick={()=>{setActive(file);setMenuOpen(false)}} key={file.name}><span>{file.type==="pdf"?"PDF":"▶"}</span><div><small>{file.type==="pdf"?"RECETA":"CLASE"} {String(i+1).padStart(2,"0")}</small><strong>{file.title}</strong></div></button>)}</nav>
       <p>Tu enlace es personal. Guárdalo para volver cuando quieras.</p>
     </aside>
     <main>
       <div className="course-mobile-bar"><button onClick={()=>setMenuOpen(true)} aria-label="Abrir clases"><span>☰</span> Clases y materiales</button><strong>Patitas & Horno</strong></div>
-      <div className="course-top"><div><span className="kicker">TU CONTENIDO</span><h1>{active?.title||"Curso de Repostería Canina"}</h1></div>{active&&<div className="course-actions"><a href={active.downloadUrl} download className="btn btn-accent px-5 py-3">↓ Descargar</a><a href={fileUrl} target="_blank" rel="noreferrer" className="btn border-2 border-teal px-5 py-3 text-teal">Abrir ↗</a></div>}</div>
-      {!active?<div className="course-empty">Aún no hay archivos. Agrega el contenido en Cloudflare R2 o en <code>private/course</code>.</div>:active.type==="pdf"?<iframe className="course-viewer" src={`${fileUrl}#toolbar=1`} title={active.title}/>:<video className="course-video" src={fileUrl} controls playsInline preload="metadata"/>}
+      <div className="course-top"><div><span className="kicker">{active?.type==="pdf"?"RECETARIO DIGITAL":"TU CONTENIDO"}</span><h1>{active?.title||"Curso de Repostería Canina"}</h1></div>{active&&<div className={`course-actions ${active.type==="pdf"?"single-action":""}`}><a href={active.downloadUrl} download className="btn btn-accent px-5 py-3">↓ Descargar</a>{active.type!=="pdf"&&<a href={fileUrl} target="_blank" rel="noreferrer" className="btn border-2 border-teal px-5 py-3 text-teal">Abrir ↗</a>}</div>}</div>
+      {!active?<div className="course-empty">Aún no hay archivos. Agrega el contenido en Cloudflare R2 o en <code>private/course</code>.</div>:active.type==="pdf"?<div className="course-pdf-shell"><PdfReader url={fileUrl} courseMode /></div>:<video className="course-video" src={fileUrl} controls playsInline preload="metadata"/>}
     </main>
   </div>;
 }

@@ -91,21 +91,24 @@ async function courseFiles(token) {
     const prefix = String(process.env.R2_COURSE_PREFIX || "course/").replace(/^\/+/, "");
     const result = await r2.send(new ListObjectsV2Command({ Bucket: process.env.R2_BUCKET, Prefix: prefix }));
     const objects = (result.Contents || []).filter((item) => item.Key && allowedExtensions.has(path.extname(item.Key).toLowerCase()));
-    return Promise.all(objects.sort((a, b) => a.Key.localeCompare(b.Key, "es", { numeric: true })).map(async (item) => {
+    return Promise.all(objects.sort((a, b) => a.Key.localeCompare(b.Key, "es", { numeric: true })).map(async (item, index) => {
       const name = item.Key;
       const displayName = path.basename(name);
-      const base = { name, title: path.parse(displayName).name.replace(/^\d+[-_. ]*/, "").replace(/[-_]/g, " "), type: path.extname(name).toLowerCase() === ".pdf" ? "pdf" : "video" };
+      const type = path.extname(name).toLowerCase() === ".pdf" ? "pdf" : "video";
+      const cleanTitle = path.parse(displayName).name.replace(/^\d+[-_. ]*/, "").replace(/[-_]/g, " ").trim();
+      const base = { name, title: cleanTitle || `${type === "pdf" ? "Receta" : "Clase"} ${String(index + 1).padStart(2, "0")}`, type };
       const expiresIn = Math.min(Number(process.env.R2_URL_EXPIRES_SECONDS || 3600), 604800);
       const url = await getSignedUrl(r2, new GetObjectCommand({ Bucket: process.env.R2_BUCKET, Key: name }), { expiresIn });
       const downloadUrl = await getSignedUrl(r2, new GetObjectCommand({ Bucket: process.env.R2_BUCKET, Key: name, ResponseContentDisposition: `attachment; filename="${displayName.replace(/"/g, "")}"` }), { expiresIn });
-      return { ...base, url, downloadUrl };
+      const protectedUrl = type === "pdf" ? `/api/course/pdf?key=${encodeURIComponent(name)}&token=${encodeURIComponent(token)}` : url;
+      return { ...base, url: protectedUrl, downloadUrl };
     }));
   }
   return fs.readdirSync(courseDir, { withFileTypes: true })
     .filter((item) => item.isFile() && allowedExtensions.has(path.extname(item.name).toLowerCase()))
-    .map((item) => ({
+    .map((item, index) => ({
       name: item.name,
-      title: path.parse(item.name).name.replace(/^\d+[-_. ]*/, "").replace(/[-_]/g, " "),
+      title: path.parse(item.name).name.replace(/^\d+[-_. ]*/, "").replace(/[-_]/g, " ").trim() || `Receta ${String(index + 1).padStart(2, "0")}`,
       type: path.extname(item.name).toLowerCase() === ".pdf" ? "pdf" : "video",
       url: `/api/course/file/${encodeURIComponent(item.name)}?token=${encodeURIComponent(token)}`,
       downloadUrl: `/api/course/file/${encodeURIComponent(item.name)}?token=${encodeURIComponent(token)}&download=1`
@@ -314,6 +317,24 @@ app.get("/api/course/file/:name", (req, res) => {
   res.setHeader("Cache-Control", "private, max-age=3600");
   if (req.query.download === "1") res.setHeader("Content-Disposition", `attachment; filename="${name.replace(/"/g, "")}"`);
   res.sendFile(file);
+});
+
+app.get("/api/course/pdf", async (req, res) => {
+  const access = readAccess(req.query.token);
+  if (!access) return res.status(401).send("Enlace no válido o vencido.");
+  const key = String(req.query.key || "");
+  if (!r2 || path.extname(key).toLowerCase() !== ".pdf") return res.sendStatus(404);
+  try {
+    const object = await r2.send(new GetObjectCommand({ Bucket: process.env.R2_BUCKET, Key: key }));
+    res.setHeader("Content-Type", object.ContentType || "application/pdf");
+    if (object.ContentLength) res.setHeader("Content-Length", String(object.ContentLength));
+    res.setHeader("Content-Disposition", `inline; filename="${path.basename(key).replace(/"/g, "")}"`);
+    res.setHeader("Cache-Control", "private, max-age=1800");
+    object.Body.pipe(res);
+  } catch (error) {
+    console.error("[course-pdf]", error);
+    if (!res.headersSent) res.sendStatus(502);
+  }
 });
 
 app.use(express.static(path.join(__dirname, "dist"), { index: false }));

@@ -187,6 +187,9 @@ function PdfReader({ url, courseMode = false }) {
   useEffect(() => {
     let task;
     let cancelled = false;
+    setPage(1);
+    setDocument(null);
+    setError("");
     import("pdfjs-dist").then((pdfjs) => {
       pdfjs.GlobalWorkerOptions.workerSrc = pdfWorker;
       task = pdfjs.getDocument(url);
@@ -219,7 +222,7 @@ function PdfReader({ url, courseMode = false }) {
 
   if (error) return <div className="pdf-reader-message">{error}</div>;
   if (!document) return <div className="pdf-reader-message"><span className="status-loader"/>Cargando recetario…</div>;
-  return <div className={`pdf-reader ${courseMode?"course-pdf-reader":""}`} ref={wrapRef}><div className="pdf-canvas-wrap"><canvas ref={canvasRef}/></div><div className="pdf-controls"><button disabled={page===1} onClick={()=>setPage(p=>p-1)}>← Anterior</button><strong>Página {page} de {document.numPages}</strong><button disabled={page===document.numPages} onClick={()=>setPage(p=>p+1)}>Siguiente →</button></div></div>;
+  return <div className={`pdf-reader ${courseMode?"course-pdf-reader":""}`} ref={wrapRef}><div className="pdf-canvas-wrap"><canvas ref={canvasRef}/></div><div className="pdf-controls"><button aria-label="Página anterior" disabled={page===1} onClick={()=>setPage(p=>p-1)}>{courseMode?"‹":"← Anterior"}</button><strong>Página {page} de {document.numPages}</strong><button aria-label="Página siguiente" disabled={page===document.numPages} onClick={()=>setPage(p=>p+1)}>{courseMode?"›":"Siguiente →"}</button></div></div>;
 }
 
 function CheckoutModal({ onClose, onError }) {

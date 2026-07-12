@@ -325,9 +325,13 @@ app.get("/api/course/pdf", async (req, res) => {
   const key = String(req.query.key || "");
   if (!r2 || path.extname(key).toLowerCase() !== ".pdf") return res.sendStatus(404);
   try {
-    const object = await r2.send(new GetObjectCommand({ Bucket: process.env.R2_BUCKET, Key: key }));
+    const requestedRange = req.headers.range;
+    const object = await r2.send(new GetObjectCommand({ Bucket: process.env.R2_BUCKET, Key: key, Range: requestedRange }));
+    if (requestedRange && object.ContentRange) res.status(206);
     res.setHeader("Content-Type", object.ContentType || "application/pdf");
     if (object.ContentLength) res.setHeader("Content-Length", String(object.ContentLength));
+    if (object.ContentRange) res.setHeader("Content-Range", object.ContentRange);
+    res.setHeader("Accept-Ranges", "bytes");
     res.setHeader("Content-Disposition", `inline; filename="${path.basename(key).replace(/"/g, "")}"`);
     res.setHeader("Cache-Control", "private, max-age=1800");
     object.Body.pipe(res);

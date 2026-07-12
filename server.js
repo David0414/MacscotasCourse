@@ -4,6 +4,7 @@ import fs from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import express from "express";
+import nodemailer from "nodemailer";
 import { GetObjectCommand, ListObjectsV2Command, S3Client } from "@aws-sdk/client-s3";
 import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
 import {
@@ -125,23 +126,32 @@ function markDelivered(paymentId, email) {
 async function sendAccessEmail(payment, accessUrl) {
   const email = payment.payer?.email;
   if (!email) throw new Error("El pago aprobado no contiene correo del comprador");
-  if (!process.env.RESEND_API_KEY || !process.env.EMAIL_FROM) {
+  const html = `<div style="font-family:Arial,sans-serif;max-width:600px;margin:auto;color:#173434"><div style="background:#0b4b49;padding:28px;border-radius:20px 20px 0 0;color:#fff"><h1 style="margin:0">¡Tu curso está listo!</h1></div><div style="padding:28px;border:1px solid #e8e1d7;border-top:0;border-radius:0 0 20px 20px"><p>Gracias por tu compra. Tu pago fue confirmado correctamente.</p><p>Desde el siguiente botón podrás ver las clases y abrir o descargar todos tus PDFs:</p><p style="text-align:center;margin:30px 0"><a href="${accessUrl}" style="display:inline-block;background:#ff6b2c;color:#fff;text-decoration:none;padding:16px 24px;border-radius:12px;font-weight:bold">Acceder a mi curso</a></p><p style="font-size:13px;color:#647674">Guarda este correo. Tu enlace es personal y no debes compartirlo.</p></div></div>`;
+  const from = process.env.EMAIL_FROM || `Patitas & Horno <${process.env.GMAIL_USER}>`;
+
+  if (process.env.RESEND_API_KEY && process.env.EMAIL_FROM) {
+    const response = await fetch("https://api.resend.com/emails", {
+      method: "POST",
+      headers: { Authorization: `Bearer ${process.env.RESEND_API_KEY}`, "Content-Type": "application/json" },
+      body: JSON.stringify({ from, to: [email], subject: "Tu acceso a Repostería Canina 🐾", html })
+    });
+    if (!response.ok) throw new Error(`Resend respondió ${response.status}: ${await response.text()}`);
+    return true;
+  }
+
+  if (process.env.GMAIL_USER && process.env.GMAIL_APP_PASSWORD) {
+    const transporter = nodemailer.createTransport({
+      service: "gmail",
+      auth: { user: process.env.GMAIL_USER, pass: process.env.GMAIL_APP_PASSWORD.replace(/\s/g, "") }
+    });
+    await transporter.sendMail({ from, to: email, subject: "Tu acceso a Repostería Canina 🐾", html });
+    return true;
+  }
+
+  {
     console.warn(`[email] Configuración incompleta. Acceso para ${email}: ${accessUrl}`);
     return false;
   }
-
-  const response = await fetch("https://api.resend.com/emails", {
-    method: "POST",
-    headers: { Authorization: `Bearer ${process.env.RESEND_API_KEY}`, "Content-Type": "application/json" },
-    body: JSON.stringify({
-      from: process.env.EMAIL_FROM,
-      to: [email],
-      subject: "Tu acceso a Repostería Canina 🐾",
-      html: `<div style="font-family:Arial,sans-serif;max-width:600px;margin:auto;color:#173434"><div style="background:#0b4b49;padding:28px;border-radius:20px 20px 0 0;color:#fff"><h1 style="margin:0">¡Tu curso está listo!</h1></div><div style="padding:28px;border:1px solid #e8e1d7;border-top:0;border-radius:0 0 20px 20px"><p>Gracias por tu compra. Tu pago fue confirmado correctamente.</p><p>Desde el siguiente botón podrás ver las clases y abrir o descargar todos tus PDFs:</p><p style="text-align:center;margin:30px 0"><a href="${accessUrl}" style="display:inline-block;background:#ff6b2c;color:#fff;text-decoration:none;padding:16px 24px;border-radius:12px;font-weight:bold">Acceder a mi curso</a></p><p style="font-size:13px;color:#647674">Guarda este correo. Tu enlace es personal y no debes compartirlo.</p></div></div>`
-    })
-  });
-  if (!response.ok) throw new Error(`Resend respondió ${response.status}: ${await response.text()}`);
-  return true;
 }
 
 async function deliverPurchase(payment) {
@@ -155,7 +165,7 @@ async function deliverPurchase(payment) {
   return { token, accessUrl };
 }
 
-app.get("/api/health", (_req, res) => res.json({ ok: true, mercadoPago: Boolean(mpClient), email: Boolean(process.env.RESEND_API_KEY && process.env.EMAIL_FROM), storage: hasR2 ? "r2" : "local" }));
+app.get("/api/health", (_req, res) => res.json({ ok: true, mercadoPago: Boolean(mpClient), email: Boolean((process.env.RESEND_API_KEY && process.env.EMAIL_FROM) || (process.env.GMAIL_USER && process.env.GMAIL_APP_PASSWORD)), storage: hasR2 ? "r2" : "local" }));
 
 app.get("/api/sample-status", (_req, res) => {
   res.json({ available: fs.existsSync(path.join(__dirname, "public", "vista-previa-ebook.pdf")) });

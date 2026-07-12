@@ -2,16 +2,16 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import pdfWorker from "pdfjs-dist/build/pdf.worker.min.mjs?url";
 import { SITE_CONFIG } from "./config";
 import { trackMeta } from "./lib/tracking";
-import ebookImage from "./assets/ebook-reposteria-canina.png";
-import cursaliaLogo from "./assets/cursalia-logo.png";
+import ebookImage from "./assets/ebook-reposteria-canina.webp";
+import cursaliaLogo from "./assets/cursalia-logo.webp";
 
 const media = {
-  hero: "https://images.unsplash.com/photo-1558788353-f76d92427f16?auto=format&fit=crop&w=1500&q=90",
-  baking: "https://images.unsplash.com/photo-1556910103-1c02745aae4d?auto=format&fit=crop&w=1200&q=88",
-  treats: "https://images.unsplash.com/photo-1589924691995-400dc9ecc119?auto=format&fit=crop&w=1200&q=88",
-  dog: "https://images.unsplash.com/photo-1517849845537-4d257902454a?auto=format&fit=crop&w=1200&q=88",
-  puppy: "https://images.unsplash.com/photo-1561037404-61cd46aa615b?auto=format&fit=crop&w=1000&q=88",
-  kitchen: "https://images.unsplash.com/photo-1556911220-e15b29be8c8f?auto=format&fit=crop&w=1200&q=88"
+  hero: "https://images.unsplash.com/photo-1558788353-f76d92427f16?auto=format&fit=crop&fm=webp&w=1100&q=74",
+  baking: "https://images.unsplash.com/photo-1556910103-1c02745aae4d?auto=format&fit=crop&fm=webp&w=900&q=72",
+  treats: "https://images.unsplash.com/photo-1589924691995-400dc9ecc119?auto=format&fit=crop&fm=webp&w=900&q=72",
+  dog: "https://images.unsplash.com/photo-1517849845537-4d257902454a?auto=format&fit=crop&fm=webp&w=900&q=72",
+  puppy: "https://images.unsplash.com/photo-1561037404-61cd46aa615b?auto=format&fit=crop&fm=webp&w=800&q=72",
+  kitchen: "https://images.unsplash.com/photo-1556911220-e15b29be8c8f?auto=format&fit=crop&fm=webp&w=900&q=72"
 };
 
 const videoFiles = import.meta.glob("./*.{mp4,webm,mov}", {
@@ -138,10 +138,10 @@ function App() {
           <div className="container-page">
             <div className="flex flex-col justify-between gap-7 lg:flex-row lg:items-end"><SectionHeading kicker="UN POQUITO DE INSPIRACIÓN" title={<>Bonito por fuera.<br/><em>Listo para sorprender.</em></>} /><p className="max-w-sm pb-10 text-[#617876]">Convierte ingredientes sencillos en premios especiales para tus mascotas o productos que puedes ofrecer a tus clientes.</p></div>
             <div className="masonry-gallery">
-              <figure className="gallery-a"><img src={media.baking} alt="Preparación artesanal en cocina"/><figcaption>Preparaciones desde cero</figcaption></figure>
-              <figure className="gallery-b"><img src={media.dog} alt="Perro esperando un premio"/><figcaption>Para tu mejor amigo</figcaption></figure>
-              <figure className="gallery-c"><img src={media.treats} alt="Premios horneados"/><figcaption>Recetas que enamoran</figcaption></figure>
-              <figure className="gallery-d"><img src={media.kitchen} alt="Cocina cálida y luminosa"/><figcaption>Desde tu propia cocina</figcaption></figure>
+              <figure className="gallery-a"><img src={media.baking} alt="Preparación artesanal en cocina" loading="lazy" decoding="async"/><figcaption>Preparaciones desde cero</figcaption></figure>
+              <figure className="gallery-b"><img src={media.dog} alt="Perro esperando un premio" loading="lazy" decoding="async"/><figcaption>Para tu mejor amigo</figcaption></figure>
+              <figure className="gallery-c"><img src={media.treats} alt="Premios horneados" loading="lazy" decoding="async"/><figcaption>Recetas que enamoran</figcaption></figure>
+              <figure className="gallery-d"><img src={media.kitchen} alt="Cocina cálida y luminosa" loading="lazy" decoding="async"/><figcaption>Desde tu propia cocina</figcaption></figure>
             </div>
           </div>
         </section>

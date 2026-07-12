@@ -162,3 +162,37 @@ Estado del servidor:
 ```text
 GET /api/health
 ```
+
+## Usar este proyecto como plantilla para otro producto
+
+La versión estable anterior a esta preparación está guardada en el tag de Git `antes-de-plantilla`. La landing publicada no cambia hasta que hagas `git push` y Railway despliegue ese commit.
+
+Para crear otro producto sin perder este:
+
+1. En GitHub crea un repositorio nuevo a partir de este proyecto (o duplica la carpeta local y cambia el remoto).
+2. Edita `src/product-config.js`. Ahí están marca, textos, precio visual, preguntas, módulos, imágenes y PDF de muestra.
+3. Sustituye el ebook dentro de `src/assets`, el PDF dentro de `public` y el video promocional dentro de `src`.
+4. Crea otro servicio en Railway conectado al repositorio nuevo. No reutilices el mismo servicio del producto actual.
+5. Copia las variables necesarias y cambia al menos:
+
+```env
+APP_URL=https://URL-DEL-NUEVO-SERVICIO
+PRODUCT_NAME=Nombre del nuevo producto
+PRODUCT_ID=identificador-del-nuevo-producto
+PRODUCT_REFERENCE_PREFIX=prefijo-unico
+PRODUCT_PRICE=55
+PRODUCT_CURRENCY=MXN
+R2_BUCKET=tu-bucket
+R2_COURSE_PREFIX=carpeta-del-producto/
+```
+
+`PRODUCT_REFERENCE_PREFIX` debe ser corto, sin espacios y diferente para cada producto. Una vez que un producto ya tenga ventas, no cambies su prefijo: se utiliza para validar que el pago corresponda a ese curso.
+
+Puedes reutilizar la misma cuenta de Mercado Pago, Brevo y el mismo píxel de Meta. Para medir cada producto por separado, crea campañas distintas y utiliza el nombre del producto enviado en los eventos. Las credenciales privadas permanecen exclusivamente en Railway; nunca deben copiarse dentro de `src/product-config.js` ni subirse a GitHub.
+
+Antes de publicar una copia ejecuta:
+
+```bash
+npm run build
+node --check server.js
+```

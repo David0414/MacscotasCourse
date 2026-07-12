@@ -83,7 +83,7 @@ function isValidPurchase(payment) {
   return payment?.status === "approved" &&
     payment.currency_id === (process.env.PRODUCT_CURRENCY || "MXN") &&
     Number(payment.transaction_amount) === Number(process.env.PRODUCT_PRICE || 55) &&
-    String(payment.external_reference || "").startsWith("patitas-");
+    String(payment.external_reference || "").startsWith(`${process.env.PRODUCT_REFERENCE_PREFIX || "patitas"}-`);
 }
 
 async function courseFiles(token) {
@@ -131,7 +131,9 @@ function markDelivered(paymentId, email) {
 async function sendAccessEmail(payment, accessUrl) {
   const email = payment.metadata?.buyer_email || payment.payer?.email;
   if (!email) throw new Error("El pago aprobado no contiene correo del comprador");
-  const html = `<div style="font-family:Arial,sans-serif;max-width:600px;margin:auto;color:#173434"><div style="background:#0b4b49;padding:28px;border-radius:20px 20px 0 0;color:#fff"><h1 style="margin:0">¡Tu curso está listo!</h1></div><div style="padding:28px;border:1px solid #e8e1d7;border-top:0;border-radius:0 0 20px 20px"><p>Gracias por tu compra. Tu pago fue confirmado correctamente.</p><p>Desde el siguiente botón podrás ver las clases y abrir o descargar todos tus PDFs:</p><p style="text-align:center;margin:30px 0"><a href="${accessUrl}" style="display:inline-block;background:#ff6b2c;color:#fff;text-decoration:none;padding:16px 24px;border-radius:12px;font-weight:bold">Acceder a mi curso</a></p><p style="font-size:13px;color:#647674">Guarda este correo. Tu enlace es personal y no debes compartirlo.</p></div></div>`;
+  const productName = process.env.PRODUCT_NAME || "Curso de Repostería Canina";
+  const emailSubject = `Tu acceso a ${productName} 🐾`;
+  const html = `<div style="font-family:Arial,sans-serif;max-width:600px;margin:auto;color:#173434"><div style="background:#0b4b49;padding:28px;border-radius:20px 20px 0 0;color:#fff"><h1 style="margin:0">¡Tu curso está listo!</h1></div><div style="padding:28px;border:1px solid #e8e1d7;border-top:0;border-radius:0 0 20px 20px"><p>Gracias por comprar ${productName}. Tu pago fue confirmado correctamente.</p><p>Desde el siguiente botón podrás ver las clases y abrir o descargar todos tus PDFs:</p><p style="text-align:center;margin:30px 0"><a href="${accessUrl}" style="display:inline-block;background:#ff6b2c;color:#fff;text-decoration:none;padding:16px 24px;border-radius:12px;font-weight:bold">Acceder a mi curso</a></p><p style="font-size:13px;color:#647674">Guarda este correo. Tu enlace es personal y no debes compartirlo.</p></div></div>`;
   const from = process.env.EMAIL_FROM || `Patitas & Horno <${process.env.GMAIL_USER}>`;
 
   if (process.env.BREVO_API_KEY && !process.env.BREVO_SENDER_EMAIL) {
@@ -148,7 +150,7 @@ async function sendAccessEmail(payment, accessUrl) {
       body: JSON.stringify({
         sender: { name: process.env.BREVO_SENDER_NAME || "Patitas & Horno", email: process.env.BREVO_SENDER_EMAIL },
         to: [{ email }],
-        subject: "Tu acceso a Repostería Canina 🐾",
+        subject: emailSubject,
         htmlContent: html
       })
     });
@@ -160,7 +162,7 @@ async function sendAccessEmail(payment, accessUrl) {
     const response = await fetch("https://api.resend.com/emails", {
       method: "POST",
       headers: { Authorization: `Bearer ${process.env.RESEND_API_KEY}`, "Content-Type": "application/json" },
-      body: JSON.stringify({ from, to: [email], subject: "Tu acceso a Repostería Canina 🐾", html })
+      body: JSON.stringify({ from, to: [email], subject: emailSubject, html })
     });
     if (!response.ok) throw new Error(`Resend respondió ${response.status}: ${await response.text()}`);
     return true;
@@ -180,7 +182,7 @@ async function sendAccessEmail(payment, accessUrl) {
       socketTimeout: 20000,
       auth: { user: process.env.GMAIL_USER, pass: process.env.GMAIL_APP_PASSWORD.replace(/\s/g, "") }
     });
-    await transporter.sendMail({ from, to: email, subject: "Tu acceso a Repostería Canina 🐾", html });
+    await transporter.sendMail({ from, to: email, subject: emailSubject, html });
     return true;
   }
 
@@ -237,9 +239,9 @@ app.post("/api/checkout", async (req, res) => {
     if (phone.length < 11 || phone.length > 15) return res.status(400).json({ error: "Escribe un teléfono de WhatsApp válido con código de país." });
 
     const preference = await new Preference(mpClient).create({ body: {
-      items: [{ id: "curso-reposteria-canina", title: process.env.PRODUCT_NAME || "Curso de Repostería Canina", quantity: 1, currency_id: process.env.PRODUCT_CURRENCY || "MXN", unit_price: Number(process.env.PRODUCT_PRICE || 55) }],
+      items: [{ id: process.env.PRODUCT_ID || "curso-reposteria-canina", title: process.env.PRODUCT_NAME || "Curso de Repostería Canina", quantity: 1, currency_id: process.env.PRODUCT_CURRENCY || "MXN", unit_price: Number(process.env.PRODUCT_PRICE || 55) }],
       payer: { email, name: name || undefined },
-      external_reference: `patitas-${crypto.randomUUID()}`,
+      external_reference: `${process.env.PRODUCT_REFERENCE_PREFIX || "patitas"}-${crypto.randomUUID()}`,
       back_urls: {
         success: `${baseUrl}/gracias`,
         pending: `${baseUrl}/pago-pendiente`,
@@ -293,7 +295,7 @@ app.get("/api/payment/status", async (req, res) => {
     const delivery = await deliverPurchase(payment);
     const email = payment.metadata?.buyer_email || payment.payer?.email || "";
     const phone = payment.metadata?.buyer_phone || "";
-    const whatsappUrl = phone ? `https://wa.me/${phone}?text=${encodeURIComponent(`Mi acceso al curso de Repostería Canina: ${delivery.accessUrl}`)}` : "";
+    const whatsappUrl = phone ? `https://wa.me/${phone}?text=${encodeURIComponent(`Mi acceso a ${process.env.PRODUCT_NAME || "Curso de Repostería Canina"}: ${delivery.accessUrl}`)}` : "";
     res.json({ status: "approved", token: delivery.token, accessUrl: delivery.accessUrl, email, whatsappUrl });
   } catch (error) {
     console.error("[payment-status]", error);

@@ -131,6 +131,13 @@ async function sendAccessEmail(payment, accessUrl) {
   const html = `<div style="font-family:Arial,sans-serif;max-width:600px;margin:auto;color:#173434"><div style="background:#0b4b49;padding:28px;border-radius:20px 20px 0 0;color:#fff"><h1 style="margin:0">¡Tu curso está listo!</h1></div><div style="padding:28px;border:1px solid #e8e1d7;border-top:0;border-radius:0 0 20px 20px"><p>Gracias por tu compra. Tu pago fue confirmado correctamente.</p><p>Desde el siguiente botón podrás ver las clases y abrir o descargar todos tus PDFs:</p><p style="text-align:center;margin:30px 0"><a href="${accessUrl}" style="display:inline-block;background:#ff6b2c;color:#fff;text-decoration:none;padding:16px 24px;border-radius:12px;font-weight:bold">Acceder a mi curso</a></p><p style="font-size:13px;color:#647674">Guarda este correo. Tu enlace es personal y no debes compartirlo.</p></div></div>`;
   const from = process.env.EMAIL_FROM || `Patitas & Horno <${process.env.GMAIL_USER}>`;
 
+  if (process.env.BREVO_API_KEY && !process.env.BREVO_SENDER_EMAIL) {
+    throw new Error("Brevo está incompleto: falta BREVO_SENDER_EMAIL en Railway");
+  }
+  if (!process.env.BREVO_API_KEY && process.env.BREVO_SENDER_EMAIL) {
+    throw new Error("Brevo está incompleto: falta BREVO_API_KEY en Railway");
+  }
+
   if (process.env.BREVO_API_KEY && process.env.BREVO_SENDER_EMAIL) {
     const response = await fetch("https://api.brevo.com/v3/smtp/email", {
       method: "POST",
@@ -193,7 +200,23 @@ async function deliverPurchase(payment) {
   return { token, accessUrl };
 }
 
-app.get("/api/health", (_req, res) => res.json({ ok: true, mercadoPago: Boolean(mpClient), email: Boolean((process.env.BREVO_API_KEY && process.env.BREVO_SENDER_EMAIL) || (process.env.RESEND_API_KEY && process.env.EMAIL_FROM) || (process.env.GMAIL_USER && process.env.GMAIL_APP_PASSWORD)), emailProvider: process.env.BREVO_API_KEY ? "brevo" : process.env.RESEND_API_KEY ? "resend" : process.env.GMAIL_USER ? "gmail" : "none", storage: hasR2 ? "r2" : "local" }));
+app.get("/api/health", (_req, res) => {
+  const brevoReady = Boolean(process.env.BREVO_API_KEY && process.env.BREVO_SENDER_EMAIL);
+  const resendReady = Boolean(process.env.RESEND_API_KEY && process.env.EMAIL_FROM);
+  const gmailReady = Boolean(process.env.GMAIL_USER && process.env.GMAIL_APP_PASSWORD);
+  res.json({
+    ok: true,
+    mercadoPago: Boolean(mpClient),
+    email: brevoReady || resendReady || gmailReady,
+    emailProvider: brevoReady ? "brevo" : resendReady ? "resend" : gmailReady ? "gmail" : "none",
+    emailConfig: {
+      brevoApiKey: Boolean(process.env.BREVO_API_KEY),
+      brevoSenderEmail: Boolean(process.env.BREVO_SENDER_EMAIL),
+      brevoSenderName: Boolean(process.env.BREVO_SENDER_NAME)
+    },
+    storage: hasR2 ? "r2" : "local"
+  });
+});
 
 app.get("/api/sample-status", (_req, res) => {
   res.json({ available: fs.existsSync(path.join(__dirname, "public", "vista-previa-ebook.pdf")) });

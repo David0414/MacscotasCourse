@@ -1,4 +1,5 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
+import pdfWorker from "pdfjs-dist/build/pdf.worker.min.mjs?url";
 import { SITE_CONFIG } from "./config";
 import { trackMeta } from "./lib/tracking";
 import ebookImage from "./assets/ebook-reposteria-canina.png";
@@ -72,9 +73,9 @@ function App() {
           <div className="orb orb-one" /><div className="orb orb-two" />
           <div className="container-page relative z-10 grid items-center gap-12 py-14 lg:grid-cols-[1.02fr_.98fr] lg:py-20">
             <div className="reveal">
-              <div className="eyebrow"><span className="live-dot" /> CURSO DIGITAL · DESDE CERO</div>
+              <div className="eyebrow"><span className="live-dot" /> RECETARIO DIGITAL + CURSO EN VIDEO</div>
               <h1 className="hero-title mt-6">Hornea amor.<span>Sirve felicidad.</span></h1>
-              <p className="mt-6 max-w-xl text-lg leading-8 text-[#526967]">Aprende repostería canina con recetas bonitas, sencillas y explicadas paso a paso. Una experiencia creativa para consentir a quien siempre está contigo.</p>
+              <p className="hero-description mt-6 max-w-xl text-lg leading-8 text-[#526967]"><strong>Recetario completo y clases en video</strong> para aprender repostería canina desde cero, con recetas bonitas, sencillas y explicadas paso a paso.</p>
               <div className="mt-8 flex flex-wrap gap-3">
                 {["2.5 h en video", "Material descargable", "Acceso a tu ritmo"].map(item => <span className="pill" key={item}>✓ {item}</span>)}
               </div>
@@ -160,7 +161,7 @@ function App() {
   );
 }
 
-function Header({onBuy}) { return <header className="site-header"><nav className="container-page"><a href="#inicio" className="brand"><span>🐾</span><div><strong>Patitas & Horno</strong><small>Repostería canina</small></div></a><div className="nav-links"><a href="#experiencia">Experiencia</a><a href="#incluye">Contenido</a><a href="#galeria">Inspiración</a><a href="#preguntas">Preguntas</a></div><button onClick={onBuy} className="btn btn-primary hidden px-5 py-3 sm:inline-flex">Quiero el curso →</button></nav></header> }
+function Header({onBuy}) { return <header className="site-header"><nav className="container-page"><a href="#inicio" className="brand"><span>🐾</span><div><strong>Patitas & Horno</strong><small>Recetario + cursos de repostería canina</small></div></a><div className="nav-links"><a href="#experiencia">Experiencia</a><a href="#incluye">Contenido</a><a href="#galeria">Inspiración</a><a href="#preguntas">Preguntas</a></div><button onClick={onBuy} className="btn btn-primary hidden px-5 py-3 sm:inline-flex">Quiero el curso →</button></nav></header> }
 
 function SectionHeading({kicker,title,text}) { return <div className="mb-10 max-w-3xl"><span className="kicker">{kicker}</span><h2 className="editorial-title mt-4">{title}</h2>{text&&<p className="mt-5 max-w-2xl text-lg leading-8 text-[#617876]">{text}</p>}</div> }
 
@@ -173,23 +174,69 @@ function PdfPreview({ onBuy }) {
       .then((response) => setAvailable(response.ok))
       .catch(() => setAvailable(false));
   }, []);
-  return <section id="muestra" className="pdf-preview-section py-20 lg:py-28"><div className="container-page grid items-center gap-12 lg:grid-cols-[.8fr_1.2fr] lg:gap-20"><div><span className="kicker">HOJEA ANTES DE COMPRAR</span><h2 className="editorial-title mt-4">Una probadita<br/><em>del ebook.</em></h2><p className="mt-6 text-lg text-[#617876]">Consulta gratis algunas páginas del material. La versión completa y las clases se entregan automáticamente después de aprobarse tu pago.</p><button onClick={onBuy} className="btn btn-accent mt-8 px-7 py-4">Obtener el curso completo →</button></div><div className="pdf-browser"><div className="pdf-browser-bar"><span/><span/><span/><strong>Vista previa · Repostería Canina</strong></div>{available ? <iframe src="/vista-previa-ebook.pdf#toolbar=0&navpanes=0" title="Vista previa del ebook Repostería Canina"/> : <div className="pdf-empty"><span>📖</span><strong>La vista previa está preparada</strong><p>Coloca el archivo <code>vista-previa-ebook.pdf</code> dentro de la carpeta <code>public</code>.</p></div>}<div className="pdf-lock"><span>🔒</span><div><strong>Vista previa gratuita</strong><small>El contenido completo se entrega después del pago</small></div></div></div></div></section>;
+  return <section id="muestra" className="pdf-preview-section py-20 lg:py-28"><div className="container-page grid items-center gap-12 lg:grid-cols-[.8fr_1.2fr] lg:gap-20"><div><span className="kicker">HOJEA ANTES DE COMPRAR</span><h2 className="editorial-title mt-4">Una probadita<br/><em>del recetario.</em></h2><p className="mt-6 text-lg text-[#617876]">Lee aquí mismo algunas páginas del material. La versión completa y las clases en video se entregan automáticamente después de aprobarse tu pago.</p><button onClick={onBuy} className="btn btn-accent mt-8 px-7 py-4">Obtener recetario + curso →</button></div><div className="pdf-browser"><div className="pdf-browser-bar"><span/><span/><span/><strong>Vista previa · Repostería Canina</strong></div>{available ? <PdfReader url="/vista-previa-ebook.pdf" /> : <div className="pdf-empty"><span>📖</span><strong>La vista previa está preparada</strong><p>Coloca el archivo <code>vista-previa-ebook.pdf</code> dentro de la carpeta <code>public</code>.</p></div>}<div className="pdf-lock"><span>🔒</span><div><strong>Vista previa gratuita</strong><small>El recetario completo se entrega después del pago</small></div></div></div></div></section>;
+}
+
+function PdfReader({ url }) {
+  const canvasRef = useRef(null);
+  const wrapRef = useRef(null);
+  const [document, setDocument] = useState(null);
+  const [page, setPage] = useState(1);
+  const [error, setError] = useState("");
+
+  useEffect(() => {
+    let task;
+    let cancelled = false;
+    import("pdfjs-dist").then((pdfjs) => {
+      pdfjs.GlobalWorkerOptions.workerSrc = pdfWorker;
+      task = pdfjs.getDocument(url);
+      return task.promise;
+    }).then((pdf) => { if (!cancelled) setDocument(pdf); }).catch(() => !cancelled && setError("No pudimos abrir la vista previa."));
+    return () => { cancelled = true; task?.destroy(); };
+  }, [url]);
+
+  useEffect(() => {
+    if (!document || !canvasRef.current || !wrapRef.current) return;
+    let renderTask;
+    let cancelled = false;
+    document.getPage(page).then((pdfPage) => {
+      if (cancelled) return;
+      const base = pdfPage.getViewport({ scale: 1 });
+      const availableWidth = Math.max(260, wrapRef.current.clientWidth - 24);
+      const cssScale = availableWidth / base.width;
+      const pixelRatio = Math.min(window.devicePixelRatio || 1, 2);
+      const viewport = pdfPage.getViewport({ scale: cssScale * pixelRatio });
+      const canvas = canvasRef.current;
+      canvas.width = viewport.width;
+      canvas.height = viewport.height;
+      canvas.style.width = `${viewport.width / pixelRatio}px`;
+      canvas.style.height = `${viewport.height / pixelRatio}px`;
+      renderTask = pdfPage.render({ canvasContext: canvas.getContext("2d"), viewport });
+      return renderTask.promise;
+    }).catch(() => !cancelled && setError("No pudimos mostrar esta página."));
+    return () => { cancelled = true; renderTask?.cancel(); };
+  }, [document, page]);
+
+  if (error) return <div className="pdf-reader-message">{error}</div>;
+  if (!document) return <div className="pdf-reader-message"><span className="status-loader"/>Cargando recetario…</div>;
+  return <div className="pdf-reader" ref={wrapRef}><div className="pdf-canvas-wrap"><canvas ref={canvasRef}/></div><div className="pdf-controls"><button disabled={page===1} onClick={()=>setPage(p=>p-1)}>← Anterior</button><strong>Página {page} de {document.numPages}</strong><button disabled={page===document.numPages} onClick={()=>setPage(p=>p+1)}>Siguiente →</button></div></div>;
 }
 
 function CheckoutModal({ onClose, onError }) {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
+  const [phone, setPhone] = useState("");
   const [loading, setLoading] = useState(false);
   const submit = async (event) => {
     event.preventDefault(); setLoading(true);
     try {
-      const response = await fetch("/api/checkout", { method:"POST", headers:{"Content-Type":"application/json"}, body:JSON.stringify({name,email}) });
+      const response = await fetch("/api/checkout", { method:"POST", headers:{"Content-Type":"application/json"}, body:JSON.stringify({name,email,phone}) });
       const data = await response.json();
       if (!response.ok) throw new Error(data.error || "No se pudo iniciar el pago.");
       window.location.href = data.checkoutUrl;
     } catch (error) { onError(error.message); setLoading(false); }
   };
-  return <div className="checkout-backdrop" role="dialog" aria-modal="true" aria-labelledby="checkout-title" onMouseDown={(e)=>e.target===e.currentTarget&&onClose()}><div className="checkout-modal"><button className="checkout-close" onClick={onClose} aria-label="Cerrar">×</button><span className="checkout-icon">🐾</span><span className="kicker">ESTÁS A UN PASO</span><h2 id="checkout-title">Recibe tu curso por correo</h2><p>Usaremos este correo para enviarte los PDFs y tu enlace privado cuando Mercado Pago confirme el pago.</p><form onSubmit={submit}><label>Tu nombre<input value={name} onChange={e=>setName(e.target.value)} autoComplete="name" placeholder="Ej. Ana" maxLength="80"/></label><label>Correo donde recibirás el curso<input type="email" value={email} onChange={e=>setEmail(e.target.value)} autoComplete="email" placeholder="tu@correo.com" required/></label><button disabled={loading} className="btn btn-accent min-h-16 w-full">{loading?"Preparando pago…":"Continuar a Mercado Pago · $55 MXN"}</button></form><small>🔒 Pago seguro procesado por Mercado Pago</small></div></div>;
+  return <div className="checkout-backdrop" role="dialog" aria-modal="true" aria-labelledby="checkout-title" onMouseDown={(e)=>e.target===e.currentTarget&&onClose()}><div className="checkout-modal"><button className="checkout-close" onClick={onClose} aria-label="Cerrar">×</button><span className="checkout-icon">🐾</span><span className="kicker">ESTÁS A UN PASO</span><h2 id="checkout-title">¿Dónde recibes tu curso?</h2><p>Usaremos estos datos para enviarte el enlace privado cuando Mercado Pago confirme tu pago.</p><form onSubmit={submit}><label>Tu nombre<input value={name} onChange={e=>setName(e.target.value)} autoComplete="name" placeholder="Ej. Ana" maxLength="80" required/></label><label>Correo donde recibirás el curso<input type="email" value={email} onChange={e=>setEmail(e.target.value)} autoComplete="email" placeholder="tu@correo.com" required/></label><label>WhatsApp con código de país<input type="tel" value={phone} onChange={e=>setPhone(e.target.value)} autoComplete="tel" placeholder="Ej. +52 442 123 4567" required/></label><button disabled={loading} className="btn btn-accent min-h-16 w-full">{loading?"Preparando pago…":"Continuar a Mercado Pago · $55 MXN"}</button></form><small>🔒 Pago seguro procesado por Mercado Pago</small></div></div>;
 }
 
 function ThankYouPage() {
@@ -199,7 +246,7 @@ function ThankYouPage() {
     if (!paymentId) return setResult({status:"invalid"});
     fetch(`/api/payment/status?payment_id=${encodeURIComponent(paymentId)}`).then(r=>r.json()).then(setResult).catch(()=>setResult({status:"error"}));
   }, []);
-  return <StatusLayout>{result.status==="loading"&&<><span className="status-loader"/><h1>Confirmando tu pago…</h1><p>Estamos consultando directamente con Mercado Pago.</p></>}{result.status==="approved"&&<><span className="status-success">✓</span><h1>¡Tu curso está listo!</h1><p>Enviamos el acceso a <strong>{result.email}</strong>. También puedes entrar ahora con el siguiente botón.</p><a href={result.accessUrl} className="btn btn-accent mt-7 px-8 py-4">Entrar a mi curso →</a><small>Guarda el correo: contiene tu enlace personal.</small></>}{result.status==="pending"&&<><span className="text-5xl">⌛</span><h1>Tu pago está pendiente</h1><p>Te enviaremos el acceso automáticamente cuando Mercado Pago lo apruebe.</p><a href="/" className="btn btn-primary mt-7 px-7 py-4">Volver al inicio</a></>}{["invalid","error","rejected","cancelled"].includes(result.status)&&<><span className="text-5xl">⚠️</span><h1>No pudimos validar el pago</h1><p>No se entregó ningún acceso. Vuelve a intentarlo o contáctanos si ya ves el cargo.</p><a href="/" className="btn btn-primary mt-7 px-7 py-4">Volver al inicio</a></>}</StatusLayout>;
+  return <StatusLayout>{result.status==="loading"&&<><span className="status-loader"/><h1>Confirmando tu pago…</h1><p>Estamos consultando directamente con Mercado Pago.</p></>}{result.status==="approved"&&<><span className="status-success">✓</span><h1>¡Tu curso está listo!</h1><p>Enviamos el acceso a <strong>{result.email}</strong>. También puedes guardarlo ahora.</p><div className="status-actions"><a href={result.accessUrl} className="btn btn-accent px-8 py-4">Entrar a mi curso →</a>{result.whatsappUrl&&<a href={result.whatsappUrl} target="_blank" rel="noreferrer" className="btn whatsapp-save px-8 py-4">Guardar en WhatsApp</a>}</div><small>El acceso se envía al correo escrito antes de pagar.</small></>}{result.status==="pending"&&<><span className="text-5xl">⌛</span><h1>Tu pago está pendiente</h1><p>Te enviaremos el acceso automáticamente cuando Mercado Pago lo apruebe.</p><a href="/" className="btn btn-primary mt-7 px-7 py-4">Volver al inicio</a></>}{["invalid","error","rejected","cancelled"].includes(result.status)&&<><span className="text-5xl">⚠️</span><h1>No pudimos validar el pago</h1><p>No se entregó ningún acceso. Vuelve a intentarlo o contáctanos si ya ves el cargo.</p><a href="/" className="btn btn-primary mt-7 px-7 py-4">Volver al inicio</a></>}</StatusLayout>;
 }
 
 function PaymentStatePage({state}) { const pending=state==="pending"; return <StatusLayout><span className="text-5xl">{pending?"⌛":"↻"}</span><h1>{pending?"Pago pendiente":"El pago no se completó"}</h1><p>{pending?"Cuando Mercado Pago confirme la operación recibirás automáticamente tu correo y enlace privado.":"No se realizó ningún cargo aprobado. Puedes regresar e intentarlo nuevamente."}</p><a href="/" className="btn btn-primary mt-7 px-7 py-4">Regresar a la página</a></StatusLayout> }

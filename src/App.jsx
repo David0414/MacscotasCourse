@@ -75,7 +75,7 @@ function App() {
           <div className="container-page relative z-10 grid items-center gap-12 py-14 lg:grid-cols-[1.02fr_.98fr] lg:py-20">
             <div className="reveal">
               <div className="eyebrow"><span className="live-dot" /> RECETARIO DIGITAL + CURSO EN VIDEO</div>
-              <h1 className="hero-title mt-6">Hornea amor.<span>Sirve felicidad.</span></h1>
+              <h1 className="hero-title mt-6">Hornea amor.<span>Emprende desde casa.</span></h1>
               <p className="hero-description mt-6 max-w-xl text-lg leading-8 text-[#526967]"><strong>Recetario completo y clases en video</strong> para crear premios para tus mascotas o comenzar tu propio emprendimiento de repostería canina.</p>
               <div className="mt-8 flex flex-wrap gap-3">
                 {["2.5 h en video", "Material descargable", "Acceso a tu ritmo"].map(item => <span className="pill" key={item}>✓ {item}</span>)}
@@ -168,7 +168,7 @@ function Header({onBuy}) { return <header className="site-header"><nav className
 
 function SectionHeading({kicker,title,text}) { return <div className="mb-10 max-w-3xl"><span className="kicker">{kicker}</span><h2 className="editorial-title mt-4">{title}</h2>{text&&<p className="mt-5 max-w-2xl text-lg leading-8 text-[#617876]">{text}</p>}</div> }
 
-function Footer({onWhatsApp}) { return <footer><div className="container-page"><div className="brand text-white"><LogoMark/><div><strong>Patitas & Horno</strong><small>Repostería canina desde casa</small></div></div><div className="footer-links"><a href="#incluye">Contenido</a><a href="#preguntas">Preguntas</a><button onClick={onWhatsApp}>Soporte</button></div><p>© {new Date().getFullYear()} Patitas & Horno · Material educativo</p></div></footer> }
+function Footer({onWhatsApp}) { return <footer><div className="container-page"><div className="brand text-white"><LogoMark/><div><strong>Patitas & Horno</strong><small>Repostería canina desde casa</small></div></div><div className="footer-links"><a href="#incluye">Contenido</a><a href="#preguntas">Preguntas</a><button onClick={onWhatsApp}>Soporte</button></div><p>© {new Date().getFullYear()} Cursalia · Material educativo</p></div></footer> }
 
 function PdfPreview({ onBuy }) {
   const [available, setAvailable] = useState(false);

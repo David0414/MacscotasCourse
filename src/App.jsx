@@ -3,6 +3,7 @@ import pdfWorker from "pdfjs-dist/build/pdf.worker.min.mjs?url";
 import { SITE_CONFIG } from "./config";
 import { trackMeta } from "./lib/tracking";
 import ebookImage from "./assets/ebook-reposteria-canina.png";
+import cursaliaLogo from "./assets/cursalia-logo.png";
 
 const media = {
   hero: "https://images.unsplash.com/photo-1558788353-f76d92427f16?auto=format&fit=crop&w=1500&q=90",
@@ -161,11 +162,13 @@ function App() {
   );
 }
 
-function Header({onBuy}) { return <header className="site-header"><nav className="container-page"><a href="#inicio" className="brand"><span>🐾</span><div><strong>Patitas & Horno</strong><small>Recetario + cursos de repostería canina</small></div></a><div className="nav-links"><a href="#experiencia">Experiencia</a><a href="#incluye">Contenido</a><a href="#galeria">Inspiración</a><a href="#preguntas">Preguntas</a></div><button onClick={onBuy} className="btn btn-primary hidden px-5 py-3 sm:inline-flex">Quiero el curso →</button></nav></header> }
+function LogoMark() { return <img className="brand-logo" src={cursaliaLogo} alt="Cursalia" /> }
+
+function Header({onBuy}) { return <header className="site-header"><nav className="container-page"><a href="#inicio" className="brand"><LogoMark/><div><strong>Patitas & Horno</strong><small>Recetario + cursos de repostería canina</small></div></a><div className="nav-links"><a href="#experiencia">Experiencia</a><a href="#incluye">Contenido</a><a href="#galeria">Inspiración</a><a href="#preguntas">Preguntas</a></div><button onClick={onBuy} className="btn btn-primary hidden px-5 py-3 sm:inline-flex">Quiero el curso →</button></nav></header> }
 
 function SectionHeading({kicker,title,text}) { return <div className="mb-10 max-w-3xl"><span className="kicker">{kicker}</span><h2 className="editorial-title mt-4">{title}</h2>{text&&<p className="mt-5 max-w-2xl text-lg leading-8 text-[#617876]">{text}</p>}</div> }
 
-function Footer({onWhatsApp}) { return <footer><div className="container-page"><div className="brand text-white"><span>🐾</span><div><strong>Patitas & Horno</strong><small>Repostería canina desde casa</small></div></div><div className="footer-links"><a href="#incluye">Contenido</a><a href="#preguntas">Preguntas</a><button onClick={onWhatsApp}>Soporte</button></div><p>© {new Date().getFullYear()} Patitas & Horno · Material educativo</p></div></footer> }
+function Footer({onWhatsApp}) { return <footer><div className="container-page"><div className="brand text-white"><LogoMark/><div><strong>Patitas & Horno</strong><small>Repostería canina desde casa</small></div></div><div className="footer-links"><a href="#incluye">Contenido</a><a href="#preguntas">Preguntas</a><button onClick={onWhatsApp}>Soporte</button></div><p>© {new Date().getFullYear()} Patitas & Horno · Material educativo</p></div></footer> }
 
 function PdfPreview({ onBuy }) {
   const [available, setAvailable] = useState(false);
@@ -255,7 +258,7 @@ function ThankYouPage() {
 
 function PaymentStatePage({state}) { const pending=state==="pending"; return <StatusLayout><span className="text-5xl">{pending?"⌛":"↻"}</span><h1>{pending?"Pago pendiente":"El pago no se completó"}</h1><p>{pending?"Cuando Mercado Pago confirme la operación recibirás automáticamente tu correo y enlace privado.":"No se realizó ningún cargo aprobado. Puedes regresar e intentarlo nuevamente."}</p><a href="/" className="btn btn-primary mt-7 px-7 py-4">Regresar a la página</a></StatusLayout> }
 
-function StatusLayout({children}) { return <main className="status-page"><div className="status-card"><a href="/" className="brand justify-center"><span>🐾</span><div><strong>Patitas & Horno</strong><small>Repostería canina</small></div></a><div className="status-content">{children}</div></div></main> }
+function StatusLayout({children}) { return <main className="status-page"><div className="status-card"><a href="/" className="brand justify-center"><LogoMark/><div><strong>Patitas & Horno</strong><small>Repostería canina</small></div></a><div className="status-content">{children}</div></div></main> }
 
 function CoursePage() {
   const token = new URLSearchParams(window.location.search).get("token") || "";
@@ -269,7 +272,7 @@ function CoursePage() {
   return <div className={`course-shell ${menuOpen?"menu-open":""}`}>
     <button className="course-backdrop" onClick={()=>setMenuOpen(false)} aria-label="Cerrar menú"/>
     <aside>
-      <div className="course-menu-head"><a href="/" className="brand"><span>🐾</span><div><strong>Patitas & Horno</strong><small>Mi curso</small></div></a><button onClick={()=>setMenuOpen(false)} aria-label="Cerrar menú">×</button></div>
+      <div className="course-menu-head"><a href="/" className="brand"><LogoMark/><div><strong>Patitas & Horno</strong><small>Mi curso</small></div></a><button onClick={()=>setMenuOpen(false)} aria-label="Cerrar menú">×</button></div>
       <div className="course-welcome"><small>BIENVENIDA</small><strong>{course.email}</strong></div>
       <nav>{course.files.map((file,i)=><button className={active?.name===file.name?"active":""} onClick={()=>{setActive(file);setMenuOpen(false)}} key={file.name}><span>{file.type==="pdf"?"PDF":"▶"}</span><div><small>{file.type==="pdf"?"RECETA":"CLASE"} {String(i+1).padStart(2,"0")}</small><strong>{file.title}</strong></div></button>)}</nav>
       <p>Tu enlace es personal. Guárdalo para volver cuando quieras.</p>

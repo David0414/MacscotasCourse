@@ -159,12 +159,9 @@ async function deliverPurchase(payment) {
   const token = signAccess(payment);
   const accessUrl = `${baseUrl}/curso?token=${encodeURIComponent(token)}`;
   if (!readDeliveries()[paymentId]) {
-    try {
-      const sent = await sendAccessEmail(payment, accessUrl);
-      if (sent) markDelivered(paymentId, payment.payer?.email);
-    } catch (error) {
-      console.error(`[email-delivery] Pago ${paymentId}:`, error);
-    }
+    void sendAccessEmail(payment, accessUrl)
+      .then((sent) => { if (sent) markDelivered(paymentId, payment.payer?.email); })
+      .catch((error) => console.error(`[email-delivery] Pago ${paymentId}:`, error));
   }
   return { token, accessUrl };
 }

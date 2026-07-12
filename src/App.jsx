@@ -22,8 +22,8 @@ const videoFiles = import.meta.glob("./*.{mp4,webm,mov}", {
 
 const modules = [
   ["01", "Repostería canina", "Galletas, cupcakes, pastelitos y opciones frías explicadas paso a paso."],
-  ["02", "Snacks y premios", "Ideas prácticas con distintos formatos, sabores y texturas."],
-  ["03", "Guía introductoria", "Conceptos básicos de alimentación casera presentados de forma accesible."],
+  ["02", "Snacks y premios", "Ideas prácticas con distintos formatos, sabores y texturas para consentir o vender."],
+  ["03", "Guía para comenzar", "Bases claras para preparar, presentar y convertir tus recetas en una oportunidad."],
   ["04", "Clases en video", "2.5 horas de contenido para aprender a tu ritmo desde cualquier dispositivo."]
 ];
 
@@ -76,7 +76,7 @@ function App() {
             <div className="reveal">
               <div className="eyebrow"><span className="live-dot" /> RECETARIO DIGITAL + CURSO EN VIDEO</div>
               <h1 className="hero-title mt-6">Hornea amor.<span>Sirve felicidad.</span></h1>
-              <p className="hero-description mt-6 max-w-xl text-lg leading-8 text-[#526967]"><strong>Recetario completo y clases en video</strong> para aprender repostería canina desde cero, con recetas bonitas, sencillas y explicadas paso a paso.</p>
+              <p className="hero-description mt-6 max-w-xl text-lg leading-8 text-[#526967]"><strong>Recetario completo y clases en video</strong> para crear premios para tus mascotas o comenzar tu propio emprendimiento de repostería canina.</p>
               <div className="mt-8 flex flex-wrap gap-3">
                 {["2.5 h en video", "Material descargable", "Acceso a tu ritmo"].map(item => <span className="pill" key={item}>✓ {item}</span>)}
               </div>
@@ -86,7 +86,7 @@ function App() {
               </div>
               <div className="mt-7 flex items-center gap-4 text-sm text-[#617876]">
                 <div className="avatar-stack">{[media.dog, media.puppy, media.hero].map((src, i) => <img key={src} src={src} alt="" style={{ zIndex: 3-i }} />)}</div>
-                <p><strong className="block text-ink">Hecho para dog lovers</strong>Sin experiencia previa</p>
+                <p><strong className="block text-ink">Para consentir o emprender</strong>Sin experiencia previa</p>
               </div>
             </div>
 
@@ -114,8 +114,8 @@ function App() {
             </div>
             <div>
               <span className="kicker text-yellow">MIRA · APRENDE · CREA</span>
-              <h2 className="editorial-title mt-4 text-white">Una experiencia que entra por los ojos.</h2>
-              <p className="mt-6 max-w-xl text-lg leading-8 text-white/65">Clases visuales y directas para que veas texturas, consistencias y presentación. Pausa, repite y avanza sin presión.</p>
+              <h2 className="editorial-title mt-4 text-white">Recetas para compartir, consentir y vender.</h2>
+              <p className="mt-6 max-w-xl text-lg leading-8 text-white/65">Clases visuales para dominar texturas, consistencias y presentación. Prepara premios para tus mascotas o crea productos atractivos para tus primeros clientes.</p>
               <div className="mt-10 grid gap-5 sm:grid-cols-2">
                 {[['01','Ingredientes claros','Prepara todo antes de comenzar.'],['02','Proceso visual','Observa cada detalle en pantalla.'],['03','Resultado bonito','Aprende a cuidar la presentación.'],['04','Siempre disponible','Consulta el contenido a tu ritmo.']].map(([n,t,x]) => <article className="dark-feature" key={n}><span>{n}</span><div><strong>{t}</strong><p>{x}</p></div></article>)}
               </div>
@@ -126,7 +126,7 @@ function App() {
 
         <section id="incluye" className="py-20 lg:py-28">
           <div className="container-page">
-            <SectionHeading kicker="TODO LO QUE RECIBES" title={<>Más que recetas:<br/><em>una nueva forma de consentir.</em></>} text="Contenido práctico, bien organizado y diseñado para llevarte de la inspiración al primer horneado." />
+            <SectionHeading kicker="TODO LO QUE RECIBES" title={<>Más que recetas:<br/><em>una oportunidad para crear.</em></>} text="Contenido práctico para consentir a tus mascotas, preparar regalos especiales o dar los primeros pasos con tu emprendimiento." />
             <div className="module-grid">{modules.map(([n,title,text], i) => <article className={`module-card module-${i+1}`} key={n}><span className="module-number">{n}</span><div><h3>{title}</h3><p>{text}</p></div>{i === 0 && <img className="ebook-product" src={ebookImage} alt="Portada del ebook Repostería Canina" />}{i === 2 && <img src={media.puppy} alt="Perrito feliz" />}</article>)}</div>
             <div className="medical-note"><span>✚</span><p><strong>Su bienestar va primero.</strong> Cada perro tiene necesidades distintas. Este curso es educativo y no sustituye la orientación de un médico veterinario.</p></div>
           </div>
@@ -136,7 +136,7 @@ function App() {
 
         <section id="galeria" className="gallery-section py-20 lg:py-28">
           <div className="container-page">
-            <div className="flex flex-col justify-between gap-7 lg:flex-row lg:items-end"><SectionHeading kicker="UN POQUITO DE INSPIRACIÓN" title={<>Bonito por fuera.<br/><em>Hecho con cariño.</em></>} /><p className="max-w-sm pb-10 text-[#617876]">Descubre ideas para convertir ingredientes sencillos en momentos inolvidables.</p></div>
+            <div className="flex flex-col justify-between gap-7 lg:flex-row lg:items-end"><SectionHeading kicker="UN POQUITO DE INSPIRACIÓN" title={<>Bonito por fuera.<br/><em>Listo para sorprender.</em></>} /><p className="max-w-sm pb-10 text-[#617876]">Convierte ingredientes sencillos en premios especiales para tus mascotas o productos que puedes ofrecer a tus clientes.</p></div>
             <div className="masonry-gallery">
               <figure className="gallery-a"><img src={media.baking} alt="Preparación artesanal en cocina"/><figcaption>Preparaciones desde cero</figcaption></figure>
               <figure className="gallery-b"><img src={media.dog} alt="Perro esperando un premio"/><figcaption>Para tu mejor amigo</figcaption></figure>
@@ -150,7 +150,7 @@ function App() {
 
         <section id="preguntas" className="bg-cream py-20 lg:py-28"><div className="container-page grid gap-12 lg:grid-cols-[.75fr_1.25fr] lg:gap-24"><div><span className="kicker">ANTES DE EMPEZAR</span><h2 className="editorial-title mt-4">Preguntas<br/><em>frecuentes.</em></h2><button onClick={handleWhatsApp} className="btn mt-7 border-2 border-teal px-6 py-3 text-teal">Hablar por WhatsApp</button></div><div className="faq-list">{faqs.map(([q,a],i)=><div key={q}><button onClick={()=>setOpenFaq(openFaq===i?-1:i)} aria-expanded={openFaq===i}><span>{String(i+1).padStart(2,'0')}</span>{q}<b>{openFaq===i?'−':'+'}</b></button>{openFaq===i&&<p>{a}</p>}</div>)}</div></div></section>
 
-        <section className="final-cta"><img src={media.hero} alt="Perro feliz"/><div className="final-overlay"/><div className="container-page relative z-10 text-center text-white"><span className="kicker text-yellow">TU PRIMERA RECETA TE ESPERA</span><h2>Un detalle pequeño.<br/><em>Un amor enorme.</em></h2><p>Curso completo + videos + material descargable</p><button onClick={handleBuy} className="btn btn-accent mt-8 min-h-16 px-9">Empezar ahora por $55 MXN →</button><small>🔒 Pago único · Acceso digital</small></div></section>
+        <section className="final-cta"><img src={media.hero} alt="Perro feliz"/><div className="final-overlay"/><div className="container-page relative z-10 text-center text-white"><span className="kicker text-yellow">TU PRIMERA RECETA TE ESPERA</span><h2>Consiente hoy.<br/><em>Emprende mañana.</em></h2><p>Recetario completo + clases en video + materiales para comenzar</p><button onClick={handleBuy} className="btn btn-accent mt-8 min-h-16 px-9">Empezar ahora por $55 MXN →</button><small>🔒 Pago único · Acceso digital</small></div></section>
       </main>
 
       <Footer onWhatsApp={handleWhatsApp}/>

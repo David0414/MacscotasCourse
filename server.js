@@ -217,9 +217,11 @@ app.post("/api/checkout", async (req, res) => {
 });
 
 app.post("/api/webhooks/mercadopago", async (req, res) => {
-  const dataId = String(req.query["data.id"] || req.body?.data?.id || "");
+  const dataId = String(req.query["data.id"] || req.query.id || req.body?.data?.id || "");
+  const eventType = String(req.query.type || req.query.topic || req.body?.type || "");
   try {
-    if (process.env.MERCADO_PAGO_WEBHOOK_SECRET) {
+    const hasSignedHeaders = Boolean(req.headers["x-signature"] && req.headers["x-request-id"]);
+    if (process.env.MERCADO_PAGO_WEBHOOK_SECRET && hasSignedHeaders && req.query["data.id"]) {
       try {
         WebhookSignatureValidator.validate({
           xSignature: req.headers["x-signature"],
@@ -231,7 +233,8 @@ app.post("/api/webhooks/mercadopago", async (req, res) => {
         console.warn(`[webhook-signature] No coincidió la firma para ${dataId}; se verificará el pago directamente con la API.`);
       }
     }
-    if ((req.query.type || req.body?.type) !== "payment") return res.sendStatus(200);
+    if (eventType !== "payment") return res.sendStatus(200);
+    if (!/^\d+$/.test(dataId)) return res.sendStatus(200);
     const payment = await getPayment(dataId);
     if (isValidPurchase(payment)) await deliverPurchase(payment);
     res.sendStatus(200);

@@ -1,19 +1,18 @@
-import ebookImage from "./assets/ebook-reposteria-canina.webp";
+import ebookImage from "./assets/manual-extensiones-pestanas.jpg";
 import cursaliaLogo from "./assets/cursalia-logo.webp";
 
 /**
  * CONFIGURACIÓN CENTRAL DEL PRODUCTO
- * Duplica el repositorio y modifica este archivo para crear otra landing.
- * Las claves privadas, R2, Mercado Pago y Brevo permanecen en Railway.
+ * Las credenciales privadas continúan exclusivamente en Railway.
  */
 export const PRODUCT_CONFIG = {
-  id: "reposteria-canina",
-  brand: "Patitas & Horno",
+  id: "extensiones-pestanas",
+  brand: "Cursalia Lash Academy",
   platformBrand: "Cursalia",
-  brandSubtitle: "Recetario + cursos de repostería canina",
-  courseSubtitle: "Mi curso",
-  productName: "Curso de Repostería Canina",
-  metaDescription: "Recetario digital y curso en video de repostería canina para consentir a tus mascotas o comenzar a emprender.",
+  brandSubtitle: "Manual + curso de extensiones de pestañas",
+  courseSubtitle: "Mi curso de pestañas",
+  productName: "Curso de Extensiones de Pestañas",
+  metaDescription: "Manual, videos y plantillas de práctica para aprender extensiones de pestañas desde cero y comenzar tu emprendimiento lash.",
   price: 55,
   currency: "MXN",
   checkoutUrl: import.meta.env.VITE_CHECKOUT_URL || "",
@@ -21,47 +20,55 @@ export const PRODUCT_CONFIG = {
   assets: {
     logo: cursaliaLogo,
     ebook: ebookImage,
-    samplePdf: "/vista-previa-ebook.pdf"
+    samplePdf: "/vista-previa-pestanas.pdf"
   },
   media: {
-    hero: "https://images.unsplash.com/photo-1558788353-f76d92427f16?auto=format&fit=crop&fm=webp&w=1100&q=74",
-    baking: "https://images.unsplash.com/photo-1556910103-1c02745aae4d?auto=format&fit=crop&fm=webp&w=900&q=72",
-    treats: "https://images.unsplash.com/photo-1589924691995-400dc9ecc119?auto=format&fit=crop&fm=webp&w=900&q=72",
-    dog: "https://images.unsplash.com/photo-1517849845537-4d257902454a?auto=format&fit=crop&fm=webp&w=900&q=72",
-    puppy: "https://images.unsplash.com/photo-1561037404-61cd46aa615b?auto=format&fit=crop&fm=webp&w=800&q=72",
-    kitchen: "https://images.unsplash.com/photo-1556911220-e15b29be8c8f?auto=format&fit=crop&fm=webp&w=900&q=72"
+    hero: "https://images.pexels.com/photos/16554435/pexels-photo-16554435.jpeg?auto=compress&cs=tinysrgb&w=1100",
+    baking: "https://images.pexels.com/photos/36930354/pexels-photo-36930354.jpeg?auto=compress&cs=tinysrgb&w=900",
+    treats: "https://images.pexels.com/photos/5128233/pexels-photo-5128233.jpeg?auto=compress&cs=tinysrgb&w=900",
+    dog: "https://images.pexels.com/photos/29391092/pexels-photo-29391092.jpeg?auto=compress&cs=tinysrgb&w=900",
+    puppy: "https://images.pexels.com/photos/34930095/pexels-photo-34930095.jpeg?auto=compress&cs=tinysrgb&w=800",
+    kitchen: "https://images.pexels.com/photos/33637444/pexels-photo-33637444.jpeg?auto=compress&cs=tinysrgb&w=900"
   },
   hero: {
-    eyebrow: "RECETARIO DIGITAL + CURSO EN VIDEO",
-    title: "Hornea amor.",
-    accentTitle: "Emprende desde casa.",
-    descriptionLead: "Recetario completo y clases en video",
-    description: "para crear premios para tus mascotas o comenzar tu propio emprendimiento de repostería canina.",
-    audienceTitle: "Para consentir o emprender",
-    audienceText: "Sin experiencia previa"
+    eyebrow: "MANUAL DIGITAL + VIDEOS + PLANTILLAS",
+    title: "Domina tu técnica.",
+    accentTitle: "Emprende como lashista.",
+    descriptionLead: "Aprende extensiones de pestañas desde cero",
+    description: "con una guía completa, procedimientos visuales y hojas de práctica para trabajar con seguridad y precisión.",
+    audienceTitle: "Para principiantes y lashistas",
+    audienceText: "Aprende, perfecciona y comienza a ofrecer tus servicios"
   },
+  pills: ["Técnicas paso a paso", "Manual descargable", "Plantillas de práctica"],
+  trust: [["20+", "temas profesionales"], ["4", "técnicas principales"], ["∞", "repasa a tu ritmo"]],
+  darkFeatures: [
+    ["01", "Bases profesionales", "Anatomía, higiene y bioseguridad."],
+    ["02", "Aplicación visual", "Observa aislamiento, postura y dirección."],
+    ["03", "Diseños y mapping", "Adapta cada diseño al tipo de ojo."],
+    ["04", "Siempre disponible", "Consulta el material a tu propio ritmo."]
+  ],
   modules: [
-    ["01", "Repostería canina", "Galletas, cupcakes, pastelitos y opciones frías explicadas paso a paso."],
-    ["02", "Snacks y premios", "Ideas prácticas con distintos formatos, sabores y texturas para consentir o vender."],
-    ["03", "Guía para comenzar", "Bases claras para preparar, presentar y convertir tus recetas en una oportunidad."],
-    ["04", "Clases en video", "2.5 horas de contenido para aprender a tu ritmo desde cualquier dispositivo."]
+    ["01", "Manual profesional", "Fundamentos, anatomía, higiene, patologías, materiales y preparación correcta de la clienta."],
+    ["02", "Técnicas de aplicación", "Clásica pelo a pelo, volumen ruso, técnica híbrida, mega volumen y aplicación por capas."],
+    ["03", "Mapping y diseño de mirada", "Grosores, largos, curvaturas y elección del diseño según la forma de cada ojo."],
+    ["04", "Videos + plantillas", "Procedimientos explicativos, hojas de práctica, consentimientos y fichas de atención."]
   ],
   faqs: [
-    ["¿El curso es físico o digital?", "Es completamente digital. Recibirás las instrucciones de acceso después de confirmar tu pago."],
-    ["¿Puedo verlo desde mi celular?", "Sí. Puedes consultar el material desde celular, tablet o computadora con conexión a internet."],
-    ["¿Necesito experiencia previa?", "No. El contenido está pensado para comenzar desde lo más básico."],
-    ["¿Cuándo recibo el material?", "Después de que el pago quede aprobado. La entrega puede realizarse por correo o WhatsApp."],
-    ["¿Sustituye la orientación veterinaria?", "No. Es material educativo y no reemplaza una valoración veterinaria o nutricional personalizada."]
+    ["¿Necesito experiencia previa?", "No. El contenido comienza desde las bases y también ayuda a lashistas que desean reforzar su técnica."],
+    ["¿El material es digital?", "Sí. Recibirás acceso al manual, videos y archivos descargables después de confirmarse tu pago."],
+    ["¿Puedo aprender desde mi celular?", "Sí. Puedes consultar el curso desde Android, iPhone, tablet o computadora."],
+    ["¿Incluye hojas de práctica?", "Sí. Recibes plantillas para practicar mapping, curvaturas, diseños y diferentes tipos de ojos."],
+    ["¿Cuándo recibo el acceso?", "El acceso se libera automáticamente cuando Mercado Pago confirma la compra."]
   ],
   sections: {
-    experienceTitle: "Recetas para compartir, consentir y vender.",
-    experienceText: "Clases visuales para dominar texturas, consistencias y presentación. Prepara premios para tus mascotas o crea productos atractivos para tus primeros clientes.",
-    packageLead: "Más que recetas:",
-    packageAccent: "una oportunidad para crear.",
-    packageText: "Contenido práctico para consentir a tus mascotas, preparar regalos especiales o dar los primeros pasos con tu emprendimiento.",
-    finalTitle: "Consiente hoy.",
-    finalAccent: "Emprende mañana.",
-    finalText: "Recetario completo + clases en video + materiales para comenzar"
+    experienceTitle: "Observa cada detalle. Perfecciona cada mirada.",
+    experienceText: "Aprende visualmente los procedimientos que marcan la diferencia: preparación, aislamiento, postura, dirección, aplicación, mantenimiento y retiro seguro.",
+    packageLead: "Todo para comenzar:",
+    packageAccent: "técnica, práctica y negocio.",
+    packageText: "Una formación digital completa para desarrollar una técnica segura, crear diseños personalizados y dar tus primeros pasos como lashista.",
+    finalTitle: "Aprende hoy.",
+    finalAccent: "Emprende como lashista.",
+    finalText: "Manual profesional + videos explicativos + plantillas de práctica"
   }
 };
 

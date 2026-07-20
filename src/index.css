@@ -87,3 +87,20 @@ body{line-height:1.65}
 /* Rendimiento: las secciones inferiores se pintan al acercarse al viewport */
 @supports(content-visibility:auto){body>.overflow-x-hidden main>section:nth-child(n+3){content-visibility:auto;contain-intrinsic-size:auto 760px}}
 @media(max-width:800px){.site-header,.course-mobile-bar{backdrop-filter:none}.orb{filter:none}.floating-card,.module-card,.masonry-gallery figure,.course-video,.course-pdf-shell{box-shadow:0 10px 26px rgba(8,47,46,.1)}.texture{display:none}.phone-glow{filter:blur(45px);opacity:.1}.hero-photo{box-shadow:0 18px 38px rgba(8,47,46,.14)}}
+
+/* Identidad Lash Academy: femenina, elegante y orientada a emprendimiento */
+:root{color:#35242d;background:#fffafb}body,.bg-paper{background:#fffafb}::selection{background:#f7b8cc;color:#3a1f2e}
+.announcement{background:#bb4f76}.announcement strong{color:#a63f66}.site-header{border-color:rgba(88,45,65,.08);background:rgba(255,250,251,.91)}
+.nav-links a:hover,.kicker,.module-number,.process-list article>span,.faq-list button>span,.faq-list button b{color:#c54f79}
+.btn-primary,.play-mini,.trust-bar,.pdf-controls button,.course-mobile-bar button{background:linear-gradient(135deg,#532d42,#7e405d)}
+.btn-accent{background:linear-gradient(135deg,#c34f78,#e47fa1);box-shadow:0 16px 34px rgba(195,79,120,.27)}
+.eyebrow,.pill{border-color:rgba(112,54,80,.12);color:#67364d}.live-dot{background:#d95f88;box-shadow:0 0 0 5px rgba(217,95,136,.13)}
+.hero-section{background:radial-gradient(circle at 15% 10%,rgba(244,187,207,.3),transparent 29%),linear-gradient(145deg,#fffafb,#fae9ef)}
+.hero-title,.editorial-title,.module-card h3,.process-list h3{color:#3e2633}.hero-title span,.editorial-title em{color:#c54f79}
+.orb-one{background:rgba(230,143,174,.24)}.orb-two{background:rgba(215,179,126,.23)}.price-badge{background:linear-gradient(145deg,#be4c75,#e17d9e)}.card-top span{color:#c54f79}
+.trust-bar{background:#4a2939}.trust-bar strong{color:#f4bfd0}.bg-ink{background:#321f2a}.text-yellow{color:#f3bfd0}.phone-glow{background:#dc7699}.play-button{background:#cf5b82}.video-note{color:#f3bfd0}.dark-feature>span{color:#e997b2}
+.module-1{background:linear-gradient(145deg,#3a2330,#61354a)}.module-3{background:#f2bfd0}.medical-note{background:#f8e9ee}.medical-note span{color:#c54f79}.gallery-section,.bg-cream{background:#f8edf1}
+.pdf-preview-section{background:linear-gradient(145deg,#fffafb,#f9e9ef)}.pdf-lock,.toast{background:rgba(63,35,49,.95)}.checkout-backdrop{background:rgba(52,29,41,.76)}.checkout-icon{background:#f3bfd0}
+.status-page{background:radial-gradient(circle at 20% 10%,rgba(238,164,190,.3),transparent 30%),linear-gradient(145deg,#fffafb,#f9e7ee)}.status-success{background:#edacc2;color:#542b3e}.status-loader{border-color:#f2dfe6;border-top-color:#c54f79}
+.course-shell>aside{background:#35212c}.course-welcome small{color:#f2b4c9}.course-shell aside nav small{color:#e884a5}.course-shell aside nav button:hover,.course-shell aside nav button.active{color:#3e2633}
+.final-overlay{background:linear-gradient(rgba(61,31,45,.34),rgba(48,27,37,.88))}.final-cta h2 em{color:#f4bfd0}footer{background:#2e1c26}.hero-photo img,.gallery-section img,.final-cta>img{filter:saturate(.88) contrast(1.02)}

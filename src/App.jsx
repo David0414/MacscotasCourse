@@ -8,7 +8,7 @@ const media = PRODUCT_CONFIG.media;
 const ebookImage = PRODUCT_CONFIG.assets.ebook;
 const cursaliaLogo = PRODUCT_CONFIG.assets.logo;
 
-const videoFiles = import.meta.glob("./*.{mp4,webm,mov}", {
+const videoFiles = import.meta.glob("./video-pestanas.{mp4,webm,mov}", {
   eager: true,
   query: "?url",
   import: "default"
@@ -16,6 +16,8 @@ const videoFiles = import.meta.glob("./*.{mp4,webm,mov}", {
 
 const modules = PRODUCT_CONFIG.modules;
 const faqs = PRODUCT_CONFIG.faqs;
+const pills = PRODUCT_CONFIG.pills;
+const darkFeatures = PRODUCT_CONFIG.darkFeatures;
 
 function App() {
   const [toast, setToast] = useState("");
@@ -65,7 +67,7 @@ function App() {
               <h1 className="hero-title mt-6">{PRODUCT_CONFIG.hero.title}<span>{PRODUCT_CONFIG.hero.accentTitle}</span></h1>
               <p className="hero-description mt-6 max-w-xl text-lg leading-8 text-[#526967]"><strong>{PRODUCT_CONFIG.hero.descriptionLead}</strong> {PRODUCT_CONFIG.hero.description}</p>
               <div className="mt-8 flex flex-wrap gap-3">
-                {["2.5 h en video", "Material descargable", "Acceso a tu ritmo"].map(item => <span className="pill" key={item}>✓ {item}</span>)}
+                {pills.map(item => <span className="pill" key={item}>✓ {item}</span>)}
               </div>
               <div className="mt-9 flex flex-col gap-4 sm:flex-row sm:items-center">
                 <button onClick={handleBuy} className="btn btn-accent min-h-16 px-8">Quiero empezar · {formatPrice()} <span>→</span></button>
@@ -78,16 +80,16 @@ function App() {
             </div>
 
             <div className="hero-collage reveal delay-1">
-              <div className="hero-photo"><img src={media.hero} alt="Perro feliz esperando su premio" /><div className="photo-shade" /></div>
+              <div className="hero-photo"><img src={media.hero} alt="Aplicación profesional de extensiones de pestañas" /><div className="photo-shade" /></div>
               <div className="floating-card card-top"><span>★★★★★</span><strong>Aprende a tu ritmo</strong><small>Desde cualquier dispositivo</small></div>
               <div className="floating-card price-badge"><small>HOY</small><strong>{formatPrice(false)}</strong><small>{PRODUCT_CONFIG.currency}</small></div>
               <img className="mini-photo ebook-mini" src={ebookImage} alt={`Ebook ${PRODUCT_CONFIG.productName}`} />
-              <div className="scribble">rico<br />y bonito <span>↗</span></div>
+              <div className="scribble">precisión<br />y belleza <span>↗</span></div>
             </div>
           </div>
         </section>
 
-        <section className="trust-bar"><div className="container-page">{[["2.5H", "de clases prácticas"], ["100%", "contenido digital"], ["∞", "repasa a tu ritmo"], [formatPrice(false), "pago único"]].map(([big, text]) => <div key={text}><strong>{big}</strong><span>{text}</span></div>)}</div></section>
+        <section className="trust-bar"><div className="container-page">{[...PRODUCT_CONFIG.trust, [formatPrice(false), "pago único"]].map(([big, text]) => <div key={text}><strong>{big}</strong><span>{text}</span></div>)}</div></section>
 
         <section id="experiencia" className="relative bg-ink py-20 text-white lg:py-28">
           <div className="texture" />
@@ -95,7 +97,7 @@ function App() {
             <div className="phone-stage">
               <div className="phone-glow" />
               <div className="phone-frame">
-                {videoSrc ? <video src={videoSrc} controls playsInline preload="metadata" /> : <div className="video-placeholder"><img src={media.baking} alt="Preparando recetas caseras" /><div className="video-overlay"><span className="play-button">▶</span><strong>Tu video vertical irá aquí</strong><small>Agrega un MP4, WEBM o MOV directamente en src</small></div></div>}
+                {videoSrc ? <video src={videoSrc} controls playsInline preload="metadata" /> : <div className="video-placeholder"><img src={media.baking} alt="Aplicación de pestañas paso a paso" /><div className="video-overlay"><span className="play-button">▶</span><strong>Tu video vertical irá aquí</strong><small>Agrega un MP4, WEBM o MOV directamente en src</small></div></div>}
               </div>
               <div className="video-note">CLASES<br />PASO A PASO <span>↙</span></div>
             </div>
@@ -104,7 +106,7 @@ function App() {
               <h2 className="editorial-title mt-4 text-white">{PRODUCT_CONFIG.sections.experienceTitle}</h2>
               <p className="mt-6 max-w-xl text-lg leading-8 text-white/65">{PRODUCT_CONFIG.sections.experienceText}</p>
               <div className="mt-10 grid gap-5 sm:grid-cols-2">
-                {[['01','Ingredientes claros','Prepara todo antes de comenzar.'],['02','Proceso visual','Observa cada detalle en pantalla.'],['03','Resultado bonito','Aprende a cuidar la presentación.'],['04','Siempre disponible','Consulta el contenido a tu ritmo.']].map(([n,t,x]) => <article className="dark-feature" key={n}><span>{n}</span><div><strong>{t}</strong><p>{x}</p></div></article>)}
+                {darkFeatures.map(([n,t,x]) => <article className="dark-feature" key={n}><span>{n}</span><div><strong>{t}</strong><p>{x}</p></div></article>)}
               </div>
               <button onClick={handleBuy} className="btn btn-accent mt-10 px-7 py-4">Quiero ver todas las clases →</button>
             </div>
@@ -115,7 +117,7 @@ function App() {
           <div className="container-page">
             <SectionHeading kicker="TODO LO QUE RECIBES" title={<>{PRODUCT_CONFIG.sections.packageLead}<br/><em>{PRODUCT_CONFIG.sections.packageAccent}</em></>} text={PRODUCT_CONFIG.sections.packageText} />
             <div className="module-grid">{modules.map(([n,title,text], i) => <article className={`module-card module-${i+1}`} key={n}><span className="module-number">{n}</span><div><h3>{title}</h3><p>{text}</p></div>{i === 0 && <img className="ebook-product" src={ebookImage} alt={`Portada de ${PRODUCT_CONFIG.productName}`} />}{i === 2 && <img src={media.puppy} alt="Perrito feliz" />}</article>)}</div>
-            <div className="medical-note"><span>✚</span><p><strong>Su bienestar va primero.</strong> Cada perro tiene necesidades distintas. Este curso es educativo y no sustituye la orientación de un médico veterinario.</p></div>
+            <div className="medical-note"><span>✦</span><p><strong>La seguridad también es técnica.</strong> Aprende normas de higiene, bioseguridad, patologías oculares, cuidados posteriores y retiro seguro.</p></div>
           </div>
         </section>
 
@@ -123,21 +125,21 @@ function App() {
 
         <section id="galeria" className="gallery-section py-20 lg:py-28">
           <div className="container-page">
-            <div className="flex flex-col justify-between gap-7 lg:flex-row lg:items-end"><SectionHeading kicker="UN POQUITO DE INSPIRACIÓN" title={<>Bonito por fuera.<br/><em>Listo para sorprender.</em></>} /><p className="max-w-sm pb-10 text-[#617876]">Convierte ingredientes sencillos en premios especiales para tus mascotas o productos que puedes ofrecer a tus clientes.</p></div>
+            <div className="flex flex-col justify-between gap-7 lg:flex-row lg:items-end"><SectionHeading kicker="INSPIRACIÓN LASH" title={<>Precisión en cada detalle.<br/><em>Miradas que destacan.</em></>} /><p className="max-w-sm pb-10 text-[#617876]">Aprende a elegir grosores, largos, curvaturas y mappings para crear diseños personalizados y profesionales.</p></div>
             <div className="masonry-gallery">
-              <figure className="gallery-a"><img src={media.baking} alt="Preparación artesanal en cocina" loading="lazy" decoding="async"/><figcaption>Preparaciones desde cero</figcaption></figure>
-              <figure className="gallery-b"><img src={media.dog} alt="Perro esperando un premio" loading="lazy" decoding="async"/><figcaption>Para tu mejor amigo</figcaption></figure>
-              <figure className="gallery-c"><img src={media.treats} alt="Premios horneados" loading="lazy" decoding="async"/><figcaption>Recetas que enamoran</figcaption></figure>
-              <figure className="gallery-d"><img src={media.kitchen} alt="Cocina cálida y luminosa" loading="lazy" decoding="async"/><figcaption>Desde tu propia cocina</figcaption></figure>
+              <figure className="gallery-a"><img src={media.baking} alt="Técnica de aplicación de pestañas" loading="lazy" decoding="async"/><figcaption>Aplicación paso a paso</figcaption></figure>
+              <figure className="gallery-b"><img src={media.dog} alt="Trabajo profesional de lashista" loading="lazy" decoding="async"/><figcaption>Precisión profesional</figcaption></figure>
+              <figure className="gallery-c"><img src={media.treats} alt="Extensiones de pestañas" loading="lazy" decoding="async"/><figcaption>Diseños para cada mirada</figcaption></figure>
+              <figure className="gallery-d"><img src={media.kitchen} alt="Estudio profesional de pestañas" loading="lazy" decoding="async"/><figcaption>Tu próximo emprendimiento</figcaption></figure>
             </div>
           </div>
         </section>
 
-        <section className="process-section py-20 lg:py-28"><div className="container-page grid gap-12 lg:grid-cols-[.8fr_1.2fr] lg:gap-24"><div className="lg:sticky lg:top-32 lg:self-start"><span className="kicker">ASÍ DE FÁCIL</span><h2 className="editorial-title mt-4">Tres pasos.<br/><em>Cero complicaciones.</em></h2><p className="mt-5 text-[#617876]">Compra una vez y empieza a disfrutar el contenido.</p></div><div className="process-list">{[["01","Elige comenzar","Presiona el botón y completa tu pago de forma segura."],["02","Recibe tu acceso","Cuando se confirme el pago te enviamos las instrucciones."],["03","Hornea a tu ritmo","Abre las clases, elige una receta y disfruta el proceso."]].map(([n,t,x])=><article key={n}><span>{n}</span><div><h3>{t}</h3><p>{x}</p></div><b>↗</b></article>)}</div></div></section>
+        <section className="process-section py-20 lg:py-28"><div className="container-page grid gap-12 lg:grid-cols-[.8fr_1.2fr] lg:gap-24"><div className="lg:sticky lg:top-32 lg:self-start"><span className="kicker">ASÍ DE FÁCIL</span><h2 className="editorial-title mt-4">Tres pasos.<br/><em>Una nueva habilidad.</em></h2><p className="mt-5 text-[#617876]">Compra una vez y estudia a tu propio ritmo.</p></div><div className="process-list">{[["01","Decide comenzar","Presiona el botón y completa tu pago de forma segura."],["02","Recibe tu acceso","Cuando se confirme el pago te enviaremos el enlace personal."],["03","Practica a tu ritmo","Estudia las técnicas, descarga las plantillas y perfecciona cada movimiento."]].map(([n,t,x])=><article key={n}><span>{n}</span><div><h3>{t}</h3><p>{x}</p></div><b>↗</b></article>)}</div></div></section>
 
         <section id="preguntas" className="bg-cream py-20 lg:py-28"><div className="container-page grid gap-12 lg:grid-cols-[.75fr_1.25fr] lg:gap-24"><div><span className="kicker">ANTES DE EMPEZAR</span><h2 className="editorial-title mt-4">Preguntas<br/><em>frecuentes.</em></h2><button onClick={handleWhatsApp} className="btn mt-7 border-2 border-teal px-6 py-3 text-teal">Hablar por WhatsApp</button></div><div className="faq-list">{faqs.map(([q,a],i)=><div key={q}><button onClick={()=>setOpenFaq(openFaq===i?-1:i)} aria-expanded={openFaq===i}><span>{String(i+1).padStart(2,'0')}</span>{q}<b>{openFaq===i?'−':'+'}</b></button>{openFaq===i&&<p>{a}</p>}</div>)}</div></div></section>
 
-        <section className="final-cta"><img src={media.hero} alt="Producto digital"/><div className="final-overlay"/><div className="container-page relative z-10 text-center text-white"><span className="kicker text-yellow">TU PRIMERA RECETA TE ESPERA</span><h2>{PRODUCT_CONFIG.sections.finalTitle}<br/><em>{PRODUCT_CONFIG.sections.finalAccent}</em></h2><p>{PRODUCT_CONFIG.sections.finalText}</p><button onClick={handleBuy} className="btn btn-accent mt-8 min-h-16 px-9">Empezar ahora por {formatPrice()} →</button><small>🔒 Pago único · Acceso digital</small></div></section>
+        <section className="final-cta"><img src={media.hero} alt="Curso digital de extensiones de pestañas"/><div className="final-overlay"/><div className="container-page relative z-10 text-center text-white"><span className="kicker text-yellow">TU CAMINO COMO LASHISTA COMIENZA AQUÍ</span><h2>{PRODUCT_CONFIG.sections.finalTitle}<br/><em>{PRODUCT_CONFIG.sections.finalAccent}</em></h2><p>{PRODUCT_CONFIG.sections.finalText}</p><button onClick={handleBuy} className="btn btn-accent mt-8 min-h-16 px-9">Empezar ahora por {formatPrice()} →</button><small>🔒 Pago único · Acceso digital</small></div></section>
       </main>
 
       <Footer onWhatsApp={handleWhatsApp}/>
@@ -164,7 +166,7 @@ function PdfPreview({ onBuy }) {
       .then((response) => setAvailable(response.ok))
       .catch(() => setAvailable(false));
   }, []);
-  return <section id="muestra" className="pdf-preview-section py-20 lg:py-28"><div className="container-page grid items-center gap-12 lg:grid-cols-[.8fr_1.2fr] lg:gap-20"><div><span className="kicker">HOJEA ANTES DE COMPRAR</span><h2 className="editorial-title mt-4">Una probadita<br/><em>del recetario.</em></h2><p className="mt-6 text-lg text-[#617876]">Lee aquí mismo algunas páginas del material. La versión completa y las clases en video se entregan automáticamente después de aprobarse tu pago.</p><button onClick={onBuy} className="btn btn-accent mt-8 px-7 py-4">Obtener recetario + curso →</button></div><div className="pdf-browser"><div className="pdf-browser-bar"><span/><span/><span/><strong>Vista previa · {PRODUCT_CONFIG.productName}</strong></div>{available ? <PdfReader url={PRODUCT_CONFIG.assets.samplePdf} /> : <div className="pdf-empty"><span>📖</span><strong>La vista previa está preparada</strong><p>Coloca el PDF configurado dentro de la carpeta <code>public</code>.</p></div>}<div className="pdf-lock"><span>🔒</span><div><strong>Vista previa gratuita</strong><small>El recetario completo se entrega después del pago</small></div></div></div></div></section>;
+  return <section id="muestra" className="pdf-preview-section py-20 lg:py-28"><div className="container-page grid items-center gap-12 lg:grid-cols-[.8fr_1.2fr] lg:gap-20"><div><span className="kicker">CONOCE EL MATERIAL</span><h2 className="editorial-title mt-4">Una mirada<br/><em>al manual.</em></h2><p className="mt-6 text-lg text-[#617876]">Lee aquí mismo algunas páginas de muestra. El manual completo, los videos y las plantillas se entregan automáticamente después de aprobarse tu pago.</p><button onClick={onBuy} className="btn btn-accent mt-8 px-7 py-4">Obtener el curso completo →</button></div><div className="pdf-browser"><div className="pdf-browser-bar"><span/><span/><span/><strong>Vista previa · {PRODUCT_CONFIG.productName}</strong></div>{available ? <PdfReader url={PRODUCT_CONFIG.assets.samplePdf} /> : <div className="pdf-empty"><span>📖</span><strong>La vista previa está preparada</strong><p>Coloca el PDF configurado dentro de la carpeta <code>public</code>.</p></div>}<div className="pdf-lock"><span>🔒</span><div><strong>Vista previa gratuita</strong><small>El material completo se entrega después del pago</small></div></div></div></div></section>;
 }
 
 function PdfReader({ url, courseMode = false }) {
@@ -211,7 +213,7 @@ function PdfReader({ url, courseMode = false }) {
   }, [document, page]);
 
   if (error) return <div className="pdf-reader-message">{error}</div>;
-  if (!document) return <div className="pdf-reader-message"><span className="status-loader"/>Cargando recetario…</div>;
+  if (!document) return <div className="pdf-reader-message"><span className="status-loader"/>Cargando manual…</div>;
   return <div className={`pdf-reader ${courseMode?"course-pdf-reader":""}`} ref={wrapRef}><div className="pdf-canvas-wrap"><canvas ref={canvasRef}/></div><div className="pdf-controls"><button aria-label="Página anterior" disabled={page===1} onClick={()=>setPage(p=>p-1)}>‹</button><strong>Página {page} de {document.numPages}</strong><button aria-label="Página siguiente" disabled={page===document.numPages} onClick={()=>setPage(p=>p+1)}>›</button></div></div>;
 }
 
@@ -230,7 +232,7 @@ function CheckoutModal({ onClose, onError }) {
       window.location.href = data.checkoutUrl;
     } catch (error) { onError(error.message); setLoading(false); }
   };
-  return <div className="checkout-backdrop" role="dialog" aria-modal="true" aria-labelledby="checkout-title" onMouseDown={(e)=>e.target===e.currentTarget&&onClose()}><div className="checkout-modal"><button className="checkout-close" onClick={onClose} aria-label="Cerrar">×</button><span className="checkout-icon">🐾</span><span className="kicker">ESTÁS A UN PASO</span><h2 id="checkout-title">¿Dónde recibes tu curso?</h2><p>Usaremos estos datos para enviarte el enlace privado cuando Mercado Pago confirme tu pago.</p><form onSubmit={submit}><label>Tu nombre<input value={name} onChange={e=>setName(e.target.value)} autoComplete="name" placeholder="Ej. Ana" maxLength="80" required/></label><label>Correo donde recibirás el curso<input type="email" value={email} onChange={e=>setEmail(e.target.value)} autoComplete="email" placeholder="tu@correo.com" required/></label><label>Tu WhatsApp<div className="phone-field"><select value={phoneCountry} onChange={e=>setPhoneCountry(e.target.value)} aria-label="País"><option value="52">🇲🇽 +52</option><option value="1">🇺🇸 +1</option><option value="57">🇨🇴 +57</option><option value="54">🇦🇷 +54</option><option value="51">🇵🇪 +51</option><option value="56">🇨🇱 +56</option><option value="34">🇪🇸 +34</option></select><input type="tel" inputMode="numeric" value={phone} onChange={e=>setPhone(e.target.value.replace(/[^\d\s-]/g,""))} autoComplete="tel-national" placeholder="442 123 4567" required/></div></label><button disabled={loading} className="btn btn-accent min-h-16 w-full">{loading?"Preparando pago…":`Continuar a Mercado Pago · ${formatPrice()}`}</button></form><small>🔒 Pago seguro procesado por Mercado Pago</small></div></div>;
+  return <div className="checkout-backdrop" role="dialog" aria-modal="true" aria-labelledby="checkout-title" onMouseDown={(e)=>e.target===e.currentTarget&&onClose()}><div className="checkout-modal"><button className="checkout-close" onClick={onClose} aria-label="Cerrar">×</button><span className="checkout-icon">✨</span><span className="kicker">ESTÁS A UN PASO</span><h2 id="checkout-title">¿Dónde recibes tu curso?</h2><p>Usaremos estos datos para enviarte el enlace privado cuando Mercado Pago confirme tu pago.</p><form onSubmit={submit}><label>Tu nombre<input value={name} onChange={e=>setName(e.target.value)} autoComplete="name" placeholder="Ej. Ana" maxLength="80" required/></label><label>Correo donde recibirás el curso<input type="email" value={email} onChange={e=>setEmail(e.target.value)} autoComplete="email" placeholder="tu@correo.com" required/></label><label>Tu WhatsApp<div className="phone-field"><select value={phoneCountry} onChange={e=>setPhoneCountry(e.target.value)} aria-label="País"><option value="52">🇲🇽 +52</option><option value="1">🇺🇸 +1</option><option value="57">🇨🇴 +57</option><option value="54">🇦🇷 +54</option><option value="51">🇵🇪 +51</option><option value="56">🇨🇱 +56</option><option value="34">🇪🇸 +34</option></select><input type="tel" inputMode="numeric" value={phone} onChange={e=>setPhone(e.target.value.replace(/[^\d\s-]/g,""))} autoComplete="tel-national" placeholder="442 123 4567" required/></div></label><button disabled={loading} className="btn btn-accent min-h-16 w-full">{loading?"Preparando pago…":`Continuar a Mercado Pago · ${formatPrice()}`}</button></form><small>🔒 Pago seguro procesado por Mercado Pago</small></div></div>;
 }
 
 function ThankYouPage() {
@@ -270,12 +272,12 @@ function CoursePage() {
     <aside>
       <div className="course-menu-head"><a href="/" className="brand"><LogoMark/><div><strong>{PRODUCT_CONFIG.brand}</strong><small>{PRODUCT_CONFIG.courseSubtitle}</small></div></a><button onClick={()=>setMenuOpen(false)} aria-label="Cerrar menú">×</button></div>
       <div className="course-welcome"><small>BIENVENIDA</small><strong>{course.email}</strong></div>
-      <nav>{course.files.map((file,i)=><button className={active?.name===file.name?"active":""} onClick={()=>{setActive(file);setMenuOpen(false)}} key={file.name}><span>{file.type==="pdf"?"PDF":"▶"}</span><div><small>{file.type==="pdf"?"RECETA":"CLASE"} {String(i+1).padStart(2,"0")}</small><strong>{file.title}</strong></div></button>)}</nav>
+      <nav>{course.files.map((file,i)=><button className={active?.name===file.name?"active":""} onClick={()=>{setActive(file);setMenuOpen(false)}} key={file.name}><span>{file.type==="pdf"?"PDF":"▶"}</span><div><small>{file.type==="pdf"?"MATERIAL":"CLASE"} {String(i+1).padStart(2,"0")}</small><strong>{file.title}</strong></div></button>)}</nav>
       <p>Tu enlace es personal. Guárdalo para volver cuando quieras.</p>
     </aside>
     <main>
       <div className="course-mobile-bar"><button onClick={()=>setMenuOpen(true)} aria-label="Abrir clases"><span>☰</span> Clases y materiales</button><strong>{PRODUCT_CONFIG.brand}</strong></div>
-      <div className="course-top"><div><span className="kicker">{active?.type==="pdf"?"RECETARIO DIGITAL":"TU CONTENIDO"}</span><h1>{active?.title||"Curso de Repostería Canina"}</h1></div>{active&&<div className={`course-actions ${active.type==="pdf"?"single-action":""}`}><a href={active.downloadUrl} download className="btn btn-accent px-5 py-3">↓ Descargar</a>{active.type!=="pdf"&&<a href={fileUrl} target="_blank" rel="noreferrer" className="btn border-2 border-teal px-5 py-3 text-teal">Abrir ↗</a>}</div>}</div>
+      <div className="course-top"><div><span className="kicker">{active?.type==="pdf"?"MANUAL Y PLANTILLAS":"TU CONTENIDO"}</span><h1>{active?.title||PRODUCT_CONFIG.productName}</h1></div>{active&&<div className={`course-actions ${active.type==="pdf"?"single-action":""}`}><a href={active.downloadUrl} download className="btn btn-accent px-5 py-3">↓ Descargar</a>{active.type!=="pdf"&&<a href={fileUrl} target="_blank" rel="noreferrer" className="btn border-2 border-teal px-5 py-3 text-teal">Abrir ↗</a>}</div>}</div>
       {!active?<div className="course-empty">Aún no hay archivos. Agrega el contenido en Cloudflare R2 o en <code>private/course</code>.</div>:active.type==="pdf"?<div className="course-pdf-shell"><PdfReader url={fileUrl} courseMode /></div>:<video className="course-video" src={fileUrl} controls playsInline preload="metadata"/>}
     </main>
   </div>;

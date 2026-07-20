@@ -83,7 +83,7 @@ function isValidPurchase(payment) {
   return payment?.status === "approved" &&
     payment.currency_id === (process.env.PRODUCT_CURRENCY || "MXN") &&
     Number(payment.transaction_amount) === Number(process.env.PRODUCT_PRICE || 55) &&
-    String(payment.external_reference || "").startsWith(`${process.env.PRODUCT_REFERENCE_PREFIX || "patitas"}-`);
+    String(payment.external_reference || "").startsWith(`${process.env.PRODUCT_REFERENCE_PREFIX || "lash"}-`);
 }
 
 async function courseFiles(token) {
@@ -96,7 +96,7 @@ async function courseFiles(token) {
       const displayName = path.basename(name);
       const type = path.extname(name).toLowerCase() === ".pdf" ? "pdf" : "video";
       const cleanTitle = path.parse(displayName).name.replace(/^\d+[-_. ]*/, "").replace(/[-_]/g, " ").trim();
-      const base = { name, title: cleanTitle || `${type === "pdf" ? "Receta" : "Clase"} ${String(index + 1).padStart(2, "0")}`, type };
+      const base = { name, title: cleanTitle || `${type === "pdf" ? "Material" : "Clase"} ${String(index + 1).padStart(2, "0")}`, type };
       const expiresIn = Math.min(Number(process.env.R2_URL_EXPIRES_SECONDS || 3600), 604800);
       const url = await getSignedUrl(r2, new GetObjectCommand({ Bucket: process.env.R2_BUCKET, Key: name }), { expiresIn });
       const downloadUrl = await getSignedUrl(r2, new GetObjectCommand({ Bucket: process.env.R2_BUCKET, Key: name, ResponseContentDisposition: `attachment; filename="${displayName.replace(/"/g, "")}"` }), { expiresIn });
@@ -108,7 +108,7 @@ async function courseFiles(token) {
     .filter((item) => item.isFile() && allowedExtensions.has(path.extname(item.name).toLowerCase()))
     .map((item, index) => ({
       name: item.name,
-      title: path.parse(item.name).name.replace(/^\d+[-_. ]*/, "").replace(/[-_]/g, " ").trim() || `Receta ${String(index + 1).padStart(2, "0")}`,
+      title: path.parse(item.name).name.replace(/^\d+[-_. ]*/, "").replace(/[-_]/g, " ").trim() || `Material ${String(index + 1).padStart(2, "0")}`,
       type: path.extname(item.name).toLowerCase() === ".pdf" ? "pdf" : "video",
       url: `/api/course/file/${encodeURIComponent(item.name)}?token=${encodeURIComponent(token)}`,
       downloadUrl: `/api/course/file/${encodeURIComponent(item.name)}?token=${encodeURIComponent(token)}&download=1`
@@ -131,10 +131,10 @@ function markDelivered(paymentId, email) {
 async function sendAccessEmail(payment, accessUrl) {
   const email = payment.metadata?.buyer_email || payment.payer?.email;
   if (!email) throw new Error("El pago aprobado no contiene correo del comprador");
-  const productName = process.env.PRODUCT_NAME || "Curso de Repostería Canina";
-  const emailSubject = `Tu acceso a ${productName} 🐾`;
+  const productName = process.env.PRODUCT_NAME || "Curso de Extensiones de Pestañas";
+  const emailSubject = `Tu acceso a ${productName} ✨`;
   const html = `<div style="font-family:Arial,sans-serif;max-width:600px;margin:auto;color:#173434"><div style="background:#0b4b49;padding:28px;border-radius:20px 20px 0 0;color:#fff"><h1 style="margin:0">¡Tu curso está listo!</h1></div><div style="padding:28px;border:1px solid #e8e1d7;border-top:0;border-radius:0 0 20px 20px"><p>Gracias por comprar ${productName}. Tu pago fue confirmado correctamente.</p><p>Desde el siguiente botón podrás ver las clases y abrir o descargar todos tus PDFs:</p><p style="text-align:center;margin:30px 0"><a href="${accessUrl}" style="display:inline-block;background:#ff6b2c;color:#fff;text-decoration:none;padding:16px 24px;border-radius:12px;font-weight:bold">Acceder a mi curso</a></p><p style="font-size:13px;color:#647674">Guarda este correo. Tu enlace es personal y no debes compartirlo.</p></div></div>`;
-  const from = process.env.EMAIL_FROM || `Patitas & Horno <${process.env.GMAIL_USER}>`;
+  const from = process.env.EMAIL_FROM || `Cursalia <${process.env.GMAIL_USER}>`;
 
   if (process.env.BREVO_API_KEY && !process.env.BREVO_SENDER_EMAIL) {
     throw new Error("Brevo está incompleto: falta BREVO_SENDER_EMAIL en Railway");
@@ -148,7 +148,7 @@ async function sendAccessEmail(payment, accessUrl) {
       method: "POST",
       headers: { "api-key": process.env.BREVO_API_KEY, "Content-Type": "application/json", Accept: "application/json" },
       body: JSON.stringify({
-        sender: { name: process.env.BREVO_SENDER_NAME || "Patitas & Horno", email: process.env.BREVO_SENDER_EMAIL },
+        sender: { name: process.env.BREVO_SENDER_NAME || "Cursalia Lash Academy", email: process.env.BREVO_SENDER_EMAIL },
         to: [{ email }],
         subject: emailSubject,
         htmlContent: html
@@ -239,9 +239,9 @@ app.post("/api/checkout", async (req, res) => {
     if (phone.length < 11 || phone.length > 15) return res.status(400).json({ error: "Escribe un teléfono de WhatsApp válido con código de país." });
 
     const preference = await new Preference(mpClient).create({ body: {
-      items: [{ id: process.env.PRODUCT_ID || "curso-reposteria-canina", title: process.env.PRODUCT_NAME || "Curso de Repostería Canina", quantity: 1, currency_id: process.env.PRODUCT_CURRENCY || "MXN", unit_price: Number(process.env.PRODUCT_PRICE || 55) }],
+      items: [{ id: process.env.PRODUCT_ID || "curso-extensiones-pestanas", title: process.env.PRODUCT_NAME || "Curso de Extensiones de Pestañas", quantity: 1, currency_id: process.env.PRODUCT_CURRENCY || "MXN", unit_price: Number(process.env.PRODUCT_PRICE || 55) }],
       payer: { email, name: name || undefined },
-      external_reference: `${process.env.PRODUCT_REFERENCE_PREFIX || "patitas"}-${crypto.randomUUID()}`,
+      external_reference: `${process.env.PRODUCT_REFERENCE_PREFIX || "lash"}-${crypto.randomUUID()}`,
       back_urls: {
         success: `${baseUrl}/gracias`,
         pending: `${baseUrl}/pago-pendiente`,
@@ -295,7 +295,7 @@ app.get("/api/payment/status", async (req, res) => {
     const delivery = await deliverPurchase(payment);
     const email = payment.metadata?.buyer_email || payment.payer?.email || "";
     const phone = payment.metadata?.buyer_phone || "";
-    const whatsappUrl = phone ? `https://wa.me/${phone}?text=${encodeURIComponent(`Mi acceso a ${process.env.PRODUCT_NAME || "Curso de Repostería Canina"}: ${delivery.accessUrl}`)}` : "";
+    const whatsappUrl = phone ? `https://wa.me/${phone}?text=${encodeURIComponent(`Mi acceso a ${process.env.PRODUCT_NAME || "Curso de Extensiones de Pestañas"}: ${delivery.accessUrl}`)}` : "";
     res.json({ status: "approved", token: delivery.token, accessUrl: delivery.accessUrl, email, whatsappUrl });
   } catch (error) {
     console.error("[payment-status]", error);
@@ -346,4 +346,4 @@ app.get("/api/course/pdf", async (req, res) => {
 app.use(express.static(path.join(__dirname, "dist"), { index: false }));
 app.get("/{*splat}", (_req, res) => res.sendFile(path.join(__dirname, "dist", "index.html")));
 
-app.listen(port, () => console.log(`Patitas & Horno disponible en ${baseUrl}`));
+app.listen(port, () => console.log(`${process.env.PRODUCT_NAME || "Cursalia Lash Academy"} disponible en ${baseUrl}`));

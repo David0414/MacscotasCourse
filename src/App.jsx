@@ -131,6 +131,8 @@ function App() {
               <figure className="gallery-b"><img src={media.dog} alt="Trabajo profesional de lashista" loading="lazy" decoding="async"/><figcaption>Precisión profesional</figcaption></figure>
               <figure className="gallery-c"><img src={media.treats} alt="Extensiones de pestañas" loading="lazy" decoding="async"/><figcaption>Diseños para cada mirada</figcaption></figure>
               <figure className="gallery-d"><img src={media.kitchen} alt="Estudio profesional de pestañas" loading="lazy" decoding="async"/><figcaption>Tu próximo emprendimiento</figcaption></figure>
+              <figure className="gallery-e"><img src={media.technique} alt="Lashista aplicando extensiones con pinzas de precisión" loading="lazy" decoding="async" width="1280" height="768"/><figcaption>Técnica limpia y precisa</figcaption></figure>
+              <figure className="gallery-f"><img src={media.studio} alt="Emprendedora organizando su estudio de pestañas" loading="lazy" decoding="async" width="1280" height="768"/><figcaption>Convierte tu habilidad en un negocio</figcaption></figure>
             </div>
           </div>
         </section>

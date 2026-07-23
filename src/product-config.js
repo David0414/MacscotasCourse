@@ -1,5 +1,7 @@
 import ebookImage from "./assets/manual-extensiones-pestanas.jpg";
 import cursaliaLogo from "./assets/cursalia-logo.webp";
+import lashTechniqueImage from "./assets/lash-technique-editorial.jpg";
+import lashStudioImage from "./assets/lash-studio-editorial.jpg";
 
 /**
  * CONFIGURACIÓN CENTRAL DEL PRODUCTO
@@ -28,7 +30,9 @@ export const PRODUCT_CONFIG = {
     treats: "https://images.pexels.com/photos/5128233/pexels-photo-5128233.jpeg?auto=compress&cs=tinysrgb&w=900",
     dog: "https://images.pexels.com/photos/29391092/pexels-photo-29391092.jpeg?auto=compress&cs=tinysrgb&w=900",
     puppy: "https://images.pexels.com/photos/34930095/pexels-photo-34930095.jpeg?auto=compress&cs=tinysrgb&w=800",
-    kitchen: "https://images.pexels.com/photos/33637444/pexels-photo-33637444.jpeg?auto=compress&cs=tinysrgb&w=900"
+    kitchen: "https://images.pexels.com/photos/33637444/pexels-photo-33637444.jpeg?auto=compress&cs=tinysrgb&w=900",
+    technique: lashTechniqueImage,
+    studio: lashStudioImage
   },
   hero: {
     eyebrow: "MANUAL DIGITAL + VIDEOS + PLANTILLAS",

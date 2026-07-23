@@ -82,7 +82,7 @@ async function getPayment(paymentId) {
 function isValidPurchase(payment) {
   return payment?.status === "approved" &&
     payment.currency_id === (process.env.PRODUCT_CURRENCY || "MXN") &&
-    Number(payment.transaction_amount) === Number(process.env.PRODUCT_PRICE || 55) &&
+    Number(payment.transaction_amount) === Number(process.env.PRODUCT_PRICE || 85) &&
     String(payment.external_reference || "").startsWith(`${process.env.PRODUCT_REFERENCE_PREFIX || "lash"}-`);
 }
 
@@ -239,7 +239,7 @@ app.post("/api/checkout", async (req, res) => {
     if (phone.length < 11 || phone.length > 15) return res.status(400).json({ error: "Escribe un teléfono de WhatsApp válido con código de país." });
 
     const preference = await new Preference(mpClient).create({ body: {
-      items: [{ id: process.env.PRODUCT_ID || "curso-extensiones-pestanas", title: process.env.PRODUCT_NAME || "Curso de Extensiones de Pestañas", quantity: 1, currency_id: process.env.PRODUCT_CURRENCY || "MXN", unit_price: Number(process.env.PRODUCT_PRICE || 55) }],
+      items: [{ id: process.env.PRODUCT_ID || "curso-extensiones-pestanas", title: process.env.PRODUCT_NAME || "Curso de Extensiones de Pestañas", quantity: 1, currency_id: process.env.PRODUCT_CURRENCY || "MXN", unit_price: Number(process.env.PRODUCT_PRICE || 85) }],
       payer: { email, name: name || undefined },
       external_reference: `${process.env.PRODUCT_REFERENCE_PREFIX || "lash"}-${crypto.randomUUID()}`,
       back_urls: {

@@ -104,3 +104,62 @@ body{line-height:1.65}
 .status-page{background:radial-gradient(circle at 20% 10%,rgba(238,164,190,.3),transparent 30%),linear-gradient(145deg,#fffafb,#f9e7ee)}.status-success{background:#edacc2;color:#542b3e}.status-loader{border-color:#f2dfe6;border-top-color:#c54f79}
 .course-shell>aside{background:#35212c}.course-welcome small{color:#f2b4c9}.course-shell aside nav small{color:#e884a5}.course-shell aside nav button:hover,.course-shell aside nav button.active{color:#3e2633}
 .final-overlay{background:linear-gradient(rgba(61,31,45,.34),rgba(48,27,37,.88))}.final-cta h2 em{color:#f4bfd0}footer{background:#2e1c26}.hero-photo img,.gallery-section img,.final-cta>img{filter:saturate(.88) contrast(1.02)}
+
+/* Escala visual premium y legibilidad mejorada en celular y laptop */
+:root{font-size:18px}
+.container-page{width:min(1240px,calc(100% - 3rem))}
+.announcement{min-height:46px;font-size:13px;line-height:1.35}.announcement strong{font-size:16px;padding:4px 12px}
+.site-header nav{min-height:84px}.brand{gap:13px}.brand strong{font-size:21px;line-height:1.05}.brand small{font-size:12px;line-height:1.35;letter-spacing:.045em}
+.brand-logo{width:58px;height:58px;flex-basis:58px;border-radius:18px}
+.nav-links{font-size:15px}.btn{font-size:16px;min-height:52px;padding-inline:1.25rem}
+.eyebrow{font-size:13px;padding:12px 17px}.pill{font-size:14px;padding:10px 15px}
+.hero-title{font-size:clamp(4.6rem,7.2vw,7.15rem);line-height:.91;letter-spacing:-.058em}
+.hero-description{font-size:20px!important;line-height:1.75!important;max-width:650px}
+.hero-collage{min-height:620px}.hero-photo{inset:24px 28px 38px 54px}
+.floating-card{padding:18px 21px}.card-top strong{font-size:17px}.card-top small{font-size:12px}
+.price-badge{width:126px;height:126px}.price-badge strong{font-size:40px}.price-badge small{font-size:11px}
+.mini-photo{width:184px;height:230px}
+.trust-bar .container-page>div{padding:23px 12px}.trust-bar strong{font-size:30px}.trust-bar span{font-size:13px}
+.kicker{font-size:13px}.editorial-title{font-size:clamp(3.4rem,5.3vw,5.8rem);line-height:.98}
+.dark-feature strong{font-size:17px}.dark-feature p{font-size:15px;line-height:1.65}
+.module-card{min-height:290px;padding:36px;border-radius:32px}.module-card h3{font-size:32px;line-height:1.08}.module-card p{font-size:17px;line-height:1.75}.module-number{font-size:13px}
+.module-1{min-height:390px}.module-1 h3{font-size:41px}
+.medical-note{padding:24px 27px;font-size:16px;line-height:1.65}
+.masonry-gallery figcaption{font-size:13px;padding:10px 15px}
+.process-list h3{font-size:33px}.process-list p{font-size:17px;line-height:1.7}
+.faq-list button{font-size:25px;line-height:1.25}.faq-list p{font-size:17px;line-height:1.75}
+.final-cta p{font-size:19px}.final-cta small{font-size:13px}
+.mobile-buy strong{font-size:20px}.mobile-buy small{font-size:11px}
+
+@media(min-width:1024px) and (max-width:1399px){
+  .container-page{width:min(1160px,calc(100% - 3.5rem))}
+  .hero-title{font-size:clamp(4.5rem,7vw,6.25rem)}
+  .hero-collage{min-height:590px}
+  .editorial-title{font-size:clamp(3.4rem,5vw,5.15rem)}
+}
+
+@media(max-width:639px){
+  :root{font-size:18px}
+  .container-page{width:min(100% - 1.4rem,1180px)}
+  .announcement{min-height:48px;gap:9px;padding:8px 10px;font-size:11px;letter-spacing:.075em;text-align:center}.announcement strong{font-size:15px;white-space:nowrap}
+  .site-header nav{min-height:88px}.brand{gap:10px}.brand-logo{width:54px;height:54px;flex-basis:54px}.brand strong{font-size:20px}.brand small{max-width:230px;font-size:12px;letter-spacing:.025em}
+  .hero-section .container-page{padding-top:42px;padding-bottom:50px}.eyebrow{font-size:11px;line-height:1.4;padding:11px 13px}
+  .hero-title{margin-top:22px;font-size:clamp(3.35rem,15.5vw,4.45rem);line-height:.94;letter-spacing:-.052em}
+  .hero-description{margin-top:23px;font-size:19px!important;line-height:1.7!important}
+  .pill{font-size:13px;line-height:1.35;padding:10px 13px}
+  .hero-section .btn-accent{width:100%;min-height:62px;font-size:16px}.hero-section a.btn{width:100%;font-size:16px}
+  .hero-collage{min-height:520px;margin-top:4px}.hero-photo{inset:18px 10px 32px 28px;border-radius:145px 145px 28px 28px}
+  .floating-card{padding:14px 15px}.card-top{max-width:190px}.card-top strong{font-size:15px}.card-top small{font-size:11px}
+  .price-badge{right:-2px;bottom:24px;width:112px;height:112px}.price-badge strong{font-size:35px}.mini-photo{width:138px;height:180px;border-width:6px}
+  .trust-bar .container-page>div{gap:8px;padding:17px 6px}.trust-bar strong{font-size:23px}.trust-bar span{font-size:11px;line-height:1.35}
+  .kicker{font-size:12px;line-height:1.4}.editorial-title{font-size:clamp(2.85rem,12.2vw,3.85rem);line-height:1}
+  .editorial-title+p,.pdf-preview-section p{font-size:18px!important;line-height:1.75!important}
+  .phone-stage{min-height:590px}.phone-frame{width:min(310px,88vw)}
+  .dark-feature{padding-top:20px}.dark-feature strong{font-size:18px}.dark-feature p{font-size:16px}
+  .module-grid{gap:16px}.module-card{min-height:285px;padding:28px;border-radius:25px}.module-card h3{font-size:31px;line-height:1.08}.module-card p{font-size:17px;line-height:1.7}.module-1{min-height:365px}.module-1 h3{font-size:36px}
+  .medical-note{padding:21px 20px;font-size:16px}
+  .masonry-gallery figcaption{font-size:12px}.process-list article{grid-template-columns:34px 1fr auto;gap:11px;padding:26px 0}.process-list h3{font-size:29px}.process-list p{font-size:17px}
+  .faq-list button{grid-template-columns:30px 1fr auto;gap:8px;padding:24px 0;font-size:22px}.faq-list p{margin-left:30px;margin-right:20px;font-size:17px}
+  .final-cta h2{font-size:clamp(3.1rem,14.5vw,4.35rem);line-height:.98}.final-cta p{font-size:18px;line-height:1.65}
+  .mobile-buy{padding:12px 13px}.mobile-buy strong{font-size:21px}.mobile-buy .btn{min-height:50px;font-size:15px}
+}

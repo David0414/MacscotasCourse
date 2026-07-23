@@ -13,7 +13,7 @@ export const PRODUCT_CONFIG = {
   courseSubtitle: "Mi curso de pestañas",
   productName: "Curso de Extensiones de Pestañas",
   metaDescription: "Manual, videos y plantillas de práctica para aprender extensiones de pestañas desde cero y comenzar tu emprendimiento lash.",
-  price: 55,
+  price: 85,
   currency: "MXN",
   checkoutUrl: import.meta.env.VITE_CHECKOUT_URL || "",
   whatsappNumber: import.meta.env.VITE_WHATSAPP_NUMBER || "521XXXXXXXXXX",

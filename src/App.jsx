@@ -8,7 +8,7 @@ const media = PRODUCT_CONFIG.media;
 const ebookImage = PRODUCT_CONFIG.assets.ebook;
 const cursaliaLogo = PRODUCT_CONFIG.assets.logo;
 
-const videoFiles = import.meta.glob("./video-pestanas.{mp4,webm,mov}", {
+const videoFiles = import.meta.glob("./video.{mp4,webm,mov}", {
   eager: true,
   query: "?url",
   import: "default"

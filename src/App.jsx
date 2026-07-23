@@ -225,8 +225,19 @@ function CheckoutModal({ onClose, onError }) {
   const [phone, setPhone] = useState("");
   const [phoneCountry, setPhoneCountry] = useState("52");
   const [loading, setLoading] = useState(false);
-  const submit = async (event) => {
-    event.preventDefault(); setLoading(true);
+  const [reviewing, setReviewing] = useState(false);
+  const countryLabel = {
+    52: "🇲🇽 +52", 1: "🇺🇸 +1", 57: "🇨🇴 +57", 54: "🇦🇷 +54",
+    51: "🇵🇪 +51", 56: "🇨🇱 +56", 34: "🇪🇸 +34"
+  }[phoneCountry];
+  const review = (event) => {
+    event.preventDefault();
+    setName(name.trim());
+    setEmail(email.trim().toLowerCase());
+    setReviewing(true);
+  };
+  const startPayment = async () => {
+    setLoading(true);
     try {
       const response = await fetch("/api/checkout", { method:"POST", headers:{"Content-Type":"application/json"}, body:JSON.stringify({name,email,phone:`${phoneCountry}${phone.replace(/\D/g, "")}`}) });
       const data = await response.json();
@@ -234,7 +245,7 @@ function CheckoutModal({ onClose, onError }) {
       window.location.href = data.checkoutUrl;
     } catch (error) { onError(error.message); setLoading(false); }
   };
-  return <div className="checkout-backdrop" role="dialog" aria-modal="true" aria-labelledby="checkout-title" onMouseDown={(e)=>e.target===e.currentTarget&&onClose()}><div className="checkout-modal"><button className="checkout-close" onClick={onClose} aria-label="Cerrar">×</button><span className="checkout-icon">✨</span><span className="kicker">ESTÁS A UN PASO</span><h2 id="checkout-title">¿Dónde recibes tu curso?</h2><p>Usaremos estos datos para enviarte el enlace privado cuando Mercado Pago confirme tu pago.</p><form onSubmit={submit}><label>Tu nombre<input value={name} onChange={e=>setName(e.target.value)} autoComplete="name" placeholder="Ej. Ana" maxLength="80" required/></label><label>Correo donde recibirás el curso<input type="email" value={email} onChange={e=>setEmail(e.target.value)} autoComplete="email" placeholder="tu@correo.com" required/></label><label>Tu WhatsApp<div className="phone-field"><select value={phoneCountry} onChange={e=>setPhoneCountry(e.target.value)} aria-label="País"><option value="52">🇲🇽 +52</option><option value="1">🇺🇸 +1</option><option value="57">🇨🇴 +57</option><option value="54">🇦🇷 +54</option><option value="51">🇵🇪 +51</option><option value="56">🇨🇱 +56</option><option value="34">🇪🇸 +34</option></select><input type="tel" inputMode="numeric" value={phone} onChange={e=>setPhone(e.target.value.replace(/[^\d\s-]/g,""))} autoComplete="tel-national" placeholder="442 123 4567" required/></div></label><button disabled={loading} className="btn btn-accent min-h-16 w-full">{loading?"Preparando pago…":`Continuar a Mercado Pago · ${formatPrice()}`}</button></form><small>🔒 Pago seguro procesado por Mercado Pago</small></div></div>;
+  return <div className="checkout-backdrop" role="dialog" aria-modal="true" aria-labelledby="checkout-title" onMouseDown={(e)=>e.target===e.currentTarget&&onClose()}><div className="checkout-modal"><button className="checkout-close" onClick={onClose} aria-label="Cerrar">×</button><span className="checkout-icon">{reviewing?"✓":"✨"}</span><span className="kicker">{reviewing?"CONFIRMA ANTES DE PAGAR":"ESTÁS A UN PASO"}</span><h2 id="checkout-title">{reviewing?"Revisa bien tus datos":"¿Dónde recibes tu curso?"}</h2><p>{reviewing?"El acceso se enviará exactamente al correo y WhatsApp que aparecen aquí.":"Usaremos estos datos para enviarte el enlace privado cuando Mercado Pago confirme tu pago."}</p>{reviewing?<div className="checkout-review"><div className="review-card"><div><span>Nombre</span><strong>{name}</strong></div><div className="review-email"><span>Correo de entrega</span><strong>{email}</strong></div><div><span>WhatsApp</span><strong>{countryLabel} {phone}</strong></div></div><div className="review-warning"><span>✦</span><p><strong>Revisa letra por letra tu correo.</strong> Ahí recibirás el enlace personal para entrar al curso.</p></div><div className="review-actions"><button type="button" disabled={loading} onClick={()=>setReviewing(false)} className="btn review-edit">← Corregir datos</button><button type="button" disabled={loading} onClick={startPayment} className="btn btn-accent">{loading?"Preparando pago…":`Sí, proceder al pago · ${formatPrice()}`}</button></div></div>:<form onSubmit={review}><label>Tu nombre<input value={name} onChange={e=>setName(e.target.value)} autoComplete="name" placeholder="Ej. Ana" maxLength="80" required/></label><label>Correo donde recibirás el curso<input type="email" value={email} onChange={e=>setEmail(e.target.value)} autoComplete="email" placeholder="tu@correo.com" required/></label><label>Tu WhatsApp<div className="phone-field"><select value={phoneCountry} onChange={e=>setPhoneCountry(e.target.value)} aria-label="País"><option value="52">🇲🇽 +52</option><option value="1">🇺🇸 +1</option><option value="57">🇨🇴 +57</option><option value="54">🇦🇷 +54</option><option value="51">🇵🇪 +51</option><option value="56">🇨🇱 +56</option><option value="34">🇪🇸 +34</option></select><input type="tel" inputMode="numeric" value={phone} onChange={e=>setPhone(e.target.value.replace(/[^\d\s-]/g,""))} autoComplete="tel-national" placeholder="442 123 4567" required/></div></label><button className="btn btn-accent min-h-16 w-full">Revisar mis datos →</button></form>}<small>🔒 Pago seguro procesado por Mercado Pago</small></div></div>;
 }
 
 function ThankYouPage() {

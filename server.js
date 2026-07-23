@@ -23,6 +23,7 @@ const courseDir = path.resolve(process.env.COURSE_FILES_DIR || path.join(__dirna
 const dataDir = path.resolve(process.env.DATA_DIR || path.join(__dirname, "data"));
 const deliveriesFile = path.join(dataDir, "deliveries.json");
 const allowedExtensions = new Set([".pdf", ".mp4", ".webm", ".mov"]);
+const accessLinkSecret = String(process.env.ACCESS_LINK_SECRET || "").trim();
 const hasR2 = ["R2_ENDPOINT", "R2_ACCESS_KEY_ID", "R2_SECRET_ACCESS_KEY", "R2_BUCKET"].every((key) => process.env[key]);
 const r2 = hasR2 ? new S3Client({
   region: "auto",
@@ -51,21 +52,26 @@ const safeEqual = (a, b) => {
 };
 
 function signAccess(payment) {
+  if (!accessLinkSecret) {
+    const error = new Error("Falta ACCESS_LINK_SECRET; no se puede generar el acceso del comprador.");
+    error.code = "ACCESS_LINK_SECRET_MISSING";
+    throw error;
+  }
   const buyerEmail = payment.metadata?.buyer_email || payment.payer?.email || "";
   const payload = Buffer.from(JSON.stringify({
     paymentId: String(payment.id),
     email: buyerEmail,
     exp: Date.now() + Number(process.env.ACCESS_LINK_DAYS || 365) * 86400000
   })).toString("base64url");
-  const signature = crypto.createHmac("sha256", process.env.ACCESS_LINK_SECRET).update(payload).digest("base64url");
+  const signature = crypto.createHmac("sha256", accessLinkSecret).update(payload).digest("base64url");
   return `${payload}.${signature}`;
 }
 
 function readAccess(token) {
   try {
     const [payload, signature] = String(token || "").split(".");
-    if (!payload || !signature || !process.env.ACCESS_LINK_SECRET) return null;
-    const expected = crypto.createHmac("sha256", process.env.ACCESS_LINK_SECRET).update(payload).digest("base64url");
+    if (!payload || !signature || !accessLinkSecret) return null;
+    const expected = crypto.createHmac("sha256", accessLinkSecret).update(payload).digest("base64url");
     if (!safeEqual(signature, expected)) return null;
     const decoded = JSON.parse(Buffer.from(payload, "base64url").toString("utf8"));
     return decoded.exp > Date.now() ? decoded : null;
@@ -212,6 +218,7 @@ app.get("/api/health", (_req, res) => {
   res.json({
     ok: true,
     mercadoPago: Boolean(mpClient),
+    accessLinks: Boolean(accessLinkSecret),
     email: brevoReady || resendReady || gmailReady,
     emailProvider: brevoReady ? "brevo" : resendReady ? "resend" : gmailReady ? "gmail" : "none",
     emailConfig: {
@@ -230,6 +237,11 @@ app.get("/api/sample-status", (_req, res) => {
 app.post("/api/checkout", async (req, res) => {
   try {
     if (!mpClient) return res.status(503).json({ error: "Mercado Pago todavía no está configurado." });
+    if (!accessLinkSecret) {
+      return res.status(503).json({
+        error: "La entrega del curso está temporalmente en mantenimiento. No se inició ningún cobro."
+      });
+    }
     const email = String(req.body?.email || "").trim().toLowerCase();
     const name = String(req.body?.name || "").trim().slice(0, 80);
     let phone = String(req.body?.phone || "").replace(/\D/g, "");
@@ -249,7 +261,7 @@ app.post("/api/checkout", async (req, res) => {
       },
       auto_return: "approved",
       notification_url: `${baseUrl}/api/webhooks/mercadopago`,
-      statement_descriptor: "PATITAS HORNO",
+      statement_descriptor: process.env.STATEMENT_DESCRIPTOR || "CURSALIA",
       metadata: { buyer_email: email, buyer_name: name, buyer_phone: phone }
     }});
     res.json({ checkoutUrl: preference.init_point });
@@ -279,11 +291,18 @@ app.post("/api/webhooks/mercadopago", async (req, res) => {
     if (eventType !== "payment") return res.sendStatus(200);
     if (!/^\d+$/.test(dataId)) return res.sendStatus(200);
     const payment = await getPayment(dataId);
-    if (isValidPurchase(payment)) await deliverPurchase(payment);
+    if (isValidPurchase(payment)) {
+      try {
+        await deliverPurchase(payment);
+      } catch (deliveryError) {
+        console.error(`[delivery-pending] Pago aprobado ${dataId}:`, deliveryError);
+        return res.sendStatus(503);
+      }
+    }
     res.sendStatus(200);
   } catch (error) {
     console.error("[webhook]", error);
-    if (!res.headersSent) res.sendStatus(401);
+    if (!res.headersSent) res.sendStatus(500);
   }
 });
 
@@ -292,9 +311,19 @@ app.get("/api/payment/status", async (req, res) => {
     const payment = await getPayment(req.query.payment_id);
     if (!payment) return res.status(400).json({ status: "invalid" });
     if (!isValidPurchase(payment)) return res.json({ status: payment.status || "invalid" });
-    const delivery = await deliverPurchase(payment);
     const email = payment.metadata?.buyer_email || payment.payer?.email || "";
     const phone = payment.metadata?.buyer_phone || "";
+    let delivery;
+    try {
+      delivery = await deliverPurchase(payment);
+    } catch (deliveryError) {
+      console.error(`[delivery-pending] Pago aprobado ${payment.id}:`, deliveryError);
+      return res.status(503).json({
+        status: "approved_delivery_pending",
+        paymentId: String(payment.id),
+        email
+      });
+    }
     const whatsappUrl = phone ? `https://wa.me/${phone}?text=${encodeURIComponent(`Mi acceso a ${process.env.PRODUCT_NAME || "Curso de Extensiones de Pestañas"}: ${delivery.accessUrl}`)}` : "";
     res.json({ status: "approved", token: delivery.token, accessUrl: delivery.accessUrl, email, whatsappUrl });
   } catch (error) {
